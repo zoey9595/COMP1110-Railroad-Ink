@@ -2,6 +2,7 @@ We declare that the work toward our submission of Stage B was distributed among 
 
 * u6865190 33.3%
 * u6090688 33.3%
-* u0234567 33.3%
+* u6213488 33.3%
 
-Signed: Yuqing Zhai(u6865190), Bob Smith (u3456789), and Sue Black (u0234567)
+Signed: Yuqing Zhai(u6865190),  Jiang huhan（u6090688) and  Yufan Zhou(u6213488)
+
