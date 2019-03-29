@@ -14,8 +14,40 @@ public class RailroadInk {
      * @return true if the tile placement is well formed
      */
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
+
+        if(tilePlacementString.length()/5 !=1 || tilePlacementString.length()%5 !=0){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(0) != 'A' && tilePlacementString.charAt(0) != 'B' && tilePlacementString.charAt(0) != 'S'){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(0) == 'A' && tilePlacementString.charAt(1)>'6'){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(0) == 'S' && tilePlacementString.charAt(1)>'6'){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(0) == 'B' && tilePlacementString.charAt(1)>'3'){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(2) > 'G'){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(3) > '6'){
+            return false;
+        }
+
+        if(tilePlacementString.charAt(4) > '7'){
+            return false;
+        }
         // FIXME Task 2: determine whether a tile placement is well-formed
-        return false;
+        return true;
     }
 
     /**
@@ -28,8 +60,30 @@ public class RailroadInk {
      * @return true if the board string is well-formed
      */
     public static boolean isBoardStringWellFormed(String boardString) {
+
+        if(boardString.length()%5 != 0) {
+            return false;
+        }
+
+        int count = 0;
+        for(int i=0; i<boardString.length(); i+=5){
+            String newString = boardString.substring(i,i+4);
+            char margin = boardString.charAt(i+4);
+            newString = newString + margin;
+            if(!isTilePlacementWellFormed(newString)){
+                return false;
+            }
+            if(newString.charAt(0) == 'S'){
+                count++;
+            }
+        }
+
+        if(count >= 3){
+            return false;
+        }else{
+            return true;
+        }
         // FIXME Task 3: determine whether a board string is well-formed
-        return false;
     }
 
 
