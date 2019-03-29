@@ -23,15 +23,15 @@ public class RailroadInk {
             return false;
         }
 
-        if(tilePlacementString.charAt(0) == 'A' && tilePlacementString.charAt(1)>'6'){
+        if(tilePlacementString.charAt(0) == 'A' && tilePlacementString.charAt(1)>'5'){
             return false;
         }
 
-        if(tilePlacementString.charAt(0) == 'S' && tilePlacementString.charAt(1)>'6'){
+        if(tilePlacementString.charAt(0) == 'S' && tilePlacementString.charAt(1)>'5'){
             return false;
         }
 
-        if(tilePlacementString.charAt(0) == 'B' && tilePlacementString.charAt(1)>'3'){
+        if(tilePlacementString.charAt(0) == 'B' && tilePlacementString.charAt(1)>'2'){
             return false;
         }
 
@@ -39,7 +39,7 @@ public class RailroadInk {
             return false;
         }
 
-        if(tilePlacementString.charAt(3) > '6'){
+        if(!(tilePlacementString.charAt(3) == '0' || tilePlacementString.charAt(3) == '1'||tilePlacementString.charAt(3) == '2'||tilePlacementString.charAt(3) == '3'||tilePlacementString.charAt(3) == '4'||tilePlacementString.charAt(3) == '5'||tilePlacementString.charAt(3) == '6')){
             return false;
         }
 
@@ -61,7 +61,13 @@ public class RailroadInk {
      */
     public static boolean isBoardStringWellFormed(String boardString) {
 
+        if(boardString == null || boardString == ""){
+            return false;
+        }
+
         if(boardString.length()%5 != 0) {
+            return false;
+        }else if(boardString.length()/5 > 31){
             return false;
         }
 
