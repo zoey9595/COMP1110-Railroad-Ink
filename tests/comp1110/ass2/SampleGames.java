@@ -31,18 +31,19 @@ public class SampleGames {
         char b = piece.charAt(1);
         char bada = (char) ('C' + r.nextInt(26));
         if (bada == 'S') bada = '!';
-        int badb = r.nextInt(5) + 8;
+        char badb = (char) (r.nextInt(5) + 8 + '0');
+        char lowp = (char) (r.nextInt(15) + '0');
 
         String loc = randomLocation(r);
-        int c = loc.charAt(0);
-        int d = loc.charAt(1);
-        int badc = r.nextInt(10) + 7 + 'A';
-        int badd = r.nextInt(10) + 7 + '0';
+        char c = loc.charAt(0);
+        char d = loc.charAt(1);
+        char badc = (char) (r.nextInt(10) + 7 + 'A');
+        char badd = (char) (r.nextInt(10) + 7 + '0');
         int e = randomOrientation(r);
         char bade = (char) ('A' + 8 + r.nextInt(10));
 
         String test = "";
-        switch (r.nextInt(7)) {
+        switch (r.nextInt(9)) {
             case 0:
                 test += "" + bada + b + c + d + e;
                 break;
@@ -63,6 +64,12 @@ public class SampleGames {
                 break;
             case 6:
                 test += "" + bada + b + badc + d + e;
+                break;
+            case 7:
+                test += "" + lowp + b + c + d + e;
+                break;
+            case 8:
+                test += "" + a + b + lowp + d + e;
                 break;
             default:
                 test += "" + a + badb + c + badd + bade;
