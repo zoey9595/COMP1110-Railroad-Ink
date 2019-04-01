@@ -105,8 +105,20 @@ public class RailroadInk {
      * @return true if the placements are connected neighbours
      */
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
+
+        /* if two tiles are not neighbours then they are invalid;
+         * so if they are in the same rol, the difference between two column numbers should be exactly 1;
+         * if they are in the same column, the difference between two row numbers should also be exactly 1;
+         * if not, return false.
+         */
+        if(!((tilePlacementStringA.charAt(2) == tilePlacementStringA.charAt(2) && Math.abs(tilePlacementStringA.charAt(3) - tilePlacementStringB.charAt(3)) == 1)||(tilePlacementStringA.charAt(3) == tilePlacementStringA.charAt(3) && Math.abs((int)tilePlacementStringA.charAt(2) - (int)tilePlacementStringB.charAt(2)) == 1))) {
+            return false;
+        }
+        String tileAType = tilePlacementStringA.substring(0,3);
+        String tileBType = tilePlacementStringB.substring(0,3);
+        //if(tileAType == "S2"|| tileAType == "A3"|| tileAType == "A4" || tileAType == "A5")&&(tileBType == "S3"|| tileBType == "A0"|| tileBType == "A1" || tileBType == "A2")
         // FIXME Task 5: determine whether neighbouring placements are connected
-        return false;
+        return true;
     }
 
     /**
