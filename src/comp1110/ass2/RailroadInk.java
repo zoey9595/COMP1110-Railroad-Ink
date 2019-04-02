@@ -35,7 +35,7 @@ public class RailroadInk {
             return false;
         }
 
-        if(tilePlacementString.charAt(2) > 'G'){
+        if(tilePlacementString.charAt(2) > 'G' || tilePlacementString.charAt(2) < 'A'){
             return false;
         }
 
