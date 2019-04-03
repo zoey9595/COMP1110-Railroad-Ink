@@ -298,6 +298,7 @@ public class RailroadInk {
 
     public static boolean isValidPlacementSequence(String boardString) {
 
+        // Test if the board string is well formed
         if(!isBoardStringWellFormed(boardString)){
             return false;
         }
@@ -306,12 +307,14 @@ public class RailroadInk {
         loop:
         while (i < boardString.length()) {
 
-            if (!isTilePlacementWellFormed(boardString.substring(i,i+5))){
+            /*if (!isTilePlacementWellFormed(boardString.substring(i,i+5))){
                 return false;
-            }
+            }*/
 
+            // The first String must connect to an exit
             if(!connectToAnExit(boardString.substring(0,5))) return false;
 
+            // if it connect to an exit, then continue loop
             if(connectToAnExit(boardString.substring(i,i+5)))
             {
                 i=i+5;
@@ -321,6 +324,7 @@ public class RailroadInk {
                 continue;
             }
 
+            // Check whether the tile can connect with any other tile before
             int j=0;
             while(j<i) {
                 if(areConnectedNeighbours(boardString.substring(j,j+5),boardString.substring(i,i+5))){
@@ -332,6 +336,7 @@ public class RailroadInk {
                 }
                 j=j+5;
             }
+            // A tile is invalid if neither connect to an exit nor a tile
             return false;
         }
         return true;
