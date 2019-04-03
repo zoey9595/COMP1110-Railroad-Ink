@@ -205,6 +205,9 @@ public class Viewer extends Application {
 
         tiles.getChildren().add(tileImageView);
         // FIXME Task 4: implement the simple placement viewer
+
+
+
     }
 
     /**
