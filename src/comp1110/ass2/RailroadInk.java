@@ -15,6 +15,22 @@ public class RailroadInk {
      */
     public static boolean isTilePlacementWellFormed(String tilePlacementString) {
         // FIXME Task 2: determine whether a tile placement is well-formed
+        if(tilePlacementString.length()==5)
+        {
+            if((tilePlacementString.charAt(0)=='A'&&tilePlacementString.charAt(1)>='0'&&tilePlacementString.charAt(1)<='6')
+                    ||(tilePlacementString.charAt(0)=='S'&&tilePlacementString.charAt(1)>='0'&&tilePlacementString.charAt(1)<='6')
+                    ||(tilePlacementString.charAt(0)=='B'&&tilePlacementString.charAt(1)>='0'&&tilePlacementString.charAt(1)<='3'))
+            {
+                if(tilePlacementString.charAt(2)>='A'&&tilePlacementString.charAt(2)<='G')
+                {
+                    if(tilePlacementString.charAt(3)>='0'&&tilePlacementString.charAt(3)<='6')
+                    {
+                        if(tilePlacementString.charAt(4)>='0'&&tilePlacementString.charAt(4)<='7')
+                            return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
@@ -29,6 +45,80 @@ public class RailroadInk {
      */
     public static boolean isBoardStringWellFormed(String boardString) {
         // FIXME Task 3: determine whether a board string is well-formed
+        int specialtiles=0;
+        if (boardString.length() % 5 != 0 || boardString.length()==0 || boardString.length()>=31*5)
+            return false;
+        int i = 0;
+        while (i < boardString.length() - 5) {
+            if(boardString.charAt(i)=='S')specialtiles++;
+            if (isTilePlacementWellFormed(boardString.substring(i, i + 5)) == false)
+                return false;
+            i=i+5;
+        }
+        //System.out.print("specialtiles "+specialtiles);
+        if(specialtiles>=3)return false;
+        return true;
+    }
+    public static boolean areNeighbours(String tilePlacementStringA, String tilePlacementStringB)
+    {
+        //same colum
+        if(((tilePlacementStringA.charAt(2)-tilePlacementStringB.charAt(2)==1)
+                ||(tilePlacementStringA.charAt(2)-tilePlacementStringB.charAt(2)==-1))
+                &&(tilePlacementStringA.charAt(3)==tilePlacementStringB.charAt(3)))
+            return true;
+        //same row
+        if(((tilePlacementStringA.charAt(3)-tilePlacementStringB.charAt(3)==1)
+                ||(tilePlacementStringA.charAt(3)-tilePlacementStringB.charAt(3)==-1))
+                &&(tilePlacementStringA.charAt(2)==tilePlacementStringB.charAt(2)))
+            return true;
+
+        return false;
+    }
+
+    //highway 1 railway 2
+    static int S0[][]={{1,1,2,1},{1,1,1,2},{2,1,1,1},{1,2,1,1},{1,1,2,1},{1,1,1,2},{2,1,1,1},{1,2,1,1}};
+    static int S1[][]={{1,2,2,2},{2,1,2,2},{2,2,1,2},{2,2,2,1},{1,2,2,2},{2,1,2,2},{2,2,1,2},{2,2,2,1}};
+    static int S2[][]={{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1},{1,1,1,1}};
+    static int S3[][]={{2,2,2,2},{2,2,2,2},{2,2,2,2},{2,2,2,2},{2,2,2,2},{2,2,2,2},{2,2,2,2},{2,2,2,2}};
+    static int S4[][]={{1,2,2,1},{1,1,2,2},{2,1,1,2},{2,2,1,1},{1,1,2,2},{2,1,1,2},{2,2,1,1},{1,2,2,1}};
+    static int S5[][]={{1,2,1,2},{2,1,2,1},{1,2,1,2},{2,1,2,1},{1,2,1,2},{2,1,2,1},{1,2,1,2},{2,1,2,1}};
+    static int A0[][]={{2,0,0,2},{2,2,0,0},{0,2,2,0},{0,0,2,2},{2,2,0,0},{0,2,2,0},{0,0,2,2},{2,0,0,2}};
+    static int A1[][]={{2,0,0,2},{0,2,0,2},{2,0,0,2},{0,2,0,2},{2,0,0,2},{0,2,0,2},{2,0,0,2},{0,2,0,2}};
+    static int A2[][]={{2,2,2,0},{0,2,2,2},{2,0,2,2},{2,2,0,2},{2,0,2,2},{2,2,0,2},{2,2,2,0},{0,2,2,2}};
+    static int A3[][]={{1,1,1,0},{0,1,1,1},{1,0,1,1},{1,1,0,1},{1,0,1,1},{1,1,0,1},{1,1,1,0},{0,1,1,1}};
+    static int A4[][]={{1,0,1,0},{0,1,0,1},{1,0,1,0},{0,1,0,1},{1,0,1,0},{0,1,0,1},{1,0,1,0},{0,1,0,1}};
+    static int A5[][]={{1,0,0,1},{1,1,0,0},{0,1,1,0},{0,0,1,1},{1,1,0,0},{0,1,1,0},{0,0,1,1},{1,0,0,1}};
+    static int B0[][]={{1,0,2,0},{0,1,0,2},{2,0,1,0},{0,2,0,1},{1,0,2,0},{0,1,0,2},{2,0,1,0},{0,2,0,1}};
+    static int B1[][]={{1,2,0,0},{0,1,2,0},{0,0,1,2},{2,0,0,1},{1,0,0,2},{2,1,0,0},{0,2,1,0},{0,0,2,1}};
+    static int B2[][]={{1,2,1,2},{2,1,2,1},{1,2,1,2},{2,1,2,1},{1,2,1,2},{2,1,2,1},{1,2,1,2},{2,1,2,1}};
+    public static int getvalue(String tilePlacementStringA,int x,int y)
+    {
+        int ans=0;
+        if(tilePlacementStringA.charAt(0)=='S'&&tilePlacementStringA.charAt(1)=='0') ans=S0[x][y];
+        if(tilePlacementStringA.charAt(0)=='S'&&tilePlacementStringA.charAt(1)=='1') ans=S1[x][y];
+        if(tilePlacementStringA.charAt(0)=='S'&&tilePlacementStringA.charAt(1)=='2') ans=S2[x][y];
+        if(tilePlacementStringA.charAt(0)=='S'&&tilePlacementStringA.charAt(1)=='3') ans=S3[x][y];
+        if(tilePlacementStringA.charAt(0)=='S'&&tilePlacementStringA.charAt(1)=='4') ans=S4[x][y];
+        if(tilePlacementStringA.charAt(0)=='S'&&tilePlacementStringA.charAt(1)=='5') ans=S5[x][y];
+        if(tilePlacementStringA.charAt(0)=='A'&&tilePlacementStringA.charAt(1)=='0') ans=A0[x][y];
+        if(tilePlacementStringA.charAt(0)=='A'&&tilePlacementStringA.charAt(1)=='1') ans=A1[x][y];
+        if(tilePlacementStringA.charAt(0)=='A'&&tilePlacementStringA.charAt(1)=='2') ans=A2[x][y];
+        if(tilePlacementStringA.charAt(0)=='A'&&tilePlacementStringA.charAt(1)=='3') ans=A3[x][y];
+        if(tilePlacementStringA.charAt(0)=='A'&&tilePlacementStringA.charAt(1)=='4') ans=A4[x][y];
+        if(tilePlacementStringA.charAt(0)=='A'&&tilePlacementStringA.charAt(1)=='5') ans=A5[x][y];
+        if(tilePlacementStringA.charAt(0)=='B'&&tilePlacementStringA.charAt(1)=='0') ans=B0[x][y];
+        if(tilePlacementStringA.charAt(0)=='B'&&tilePlacementStringA.charAt(1)=='1') ans=B1[x][y];
+        if(tilePlacementStringA.charAt(0)=='B'&&tilePlacementStringA.charAt(1)=='2') ans=B2[x][y];
+        return ans;
+    }
+    public static boolean areConnected(String tilePlacementStringA, String tilePlacementStringB,int indexA,int indexB)
+    {
+        int valueA=getvalue(tilePlacementStringA,tilePlacementStringA.charAt(4)-'0',indexA);
+        int valueB=getvalue(tilePlacementStringB,tilePlacementStringB.charAt(4)-'0',indexB);
+        //System.out.println("valueA "+valueA+" valueB "+valueB);
+        if(valueA==0||valueB==0)return false;
+        if(valueA==valueB) return true;
+
         return false;
     }
 
@@ -46,6 +136,30 @@ public class RailroadInk {
      */
     public static boolean areConnectedNeighbours(String tilePlacementStringA, String tilePlacementStringB) {
         // FIXME Task 5: determine whether neighbouring placements are connected
+        //first judge neighbour
+        if(areNeighbours(tilePlacementStringA,tilePlacementStringB)==false)return false;
+
+
+        if(tilePlacementStringA.charAt(2)-tilePlacementStringB.charAt(2)==1)
+        {//System.out.println("1");
+            if(areConnected(tilePlacementStringA,tilePlacementStringB,0,2)==true)
+                return true;
+        }
+        if(tilePlacementStringA.charAt(2)-tilePlacementStringB.charAt(2)==-1)
+        {//System.out.println("2");
+            if(areConnected(tilePlacementStringA,tilePlacementStringB,2,0)==true)
+                return true;
+        }
+        if(tilePlacementStringA.charAt(3)-tilePlacementStringB.charAt(3)==1)
+        {//System.out.println("3");
+            if(areConnected(tilePlacementStringA,tilePlacementStringB,3,1)==true)
+                return true;
+        }
+        if(tilePlacementStringA.charAt(3)-tilePlacementStringB.charAt(3)==-1)
+        {//System.out.println("4");
+            if(areConnected(tilePlacementStringA,tilePlacementStringB,1,3)==true)
+                return true;
+        }
         return false;
     }
 
@@ -65,9 +179,90 @@ public class RailroadInk {
      * @param boardString a board string representing some placement sequence
      * @return true if placement sequence is valid
      */
+    public static boolean connectToAnExit(String tilePlacementString)
+    {
+        int exits=0;
+
+        if((tilePlacementString.charAt(2)=='B'&&tilePlacementString.charAt(3)=='0')
+                ||(tilePlacementString.charAt(2)=='F'&&tilePlacementString.charAt(3)=='0'))
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',3)==2)
+                exits++;
+        }
+        if(tilePlacementString.charAt(2)=='D'&&tilePlacementString.charAt(3)=='0')
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',3)==1)
+                exits++;
+        }
+        //top 3 exits
+        if((tilePlacementString.charAt(2)=='A'&&tilePlacementString.charAt(3)=='2')
+                ||(tilePlacementString.charAt(2)=='A'&&tilePlacementString.charAt(3)=='5'))
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',0)==1)
+                exits++;
+        }
+        if(tilePlacementString.charAt(2)=='A'&&tilePlacementString.charAt(3)=='3')
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',0)==2)
+                exits++;
+        }
+        //right 3 exits
+        if((tilePlacementString.charAt(2)=='B'&&tilePlacementString.charAt(3)=='6')
+                ||(tilePlacementString.charAt(2)=='F'&&tilePlacementString.charAt(3)=='6'))
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',0)==2)
+                exits++;
+        }
+        if(tilePlacementString.charAt(2)=='D'&&tilePlacementString.charAt(3)=='6')
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',0)==1)
+                exits++;
+        }
+        //down 3 exits
+        if((tilePlacementString.charAt(2)=='G'&&tilePlacementString.charAt(3)=='1')
+                ||(tilePlacementString.charAt(2)=='G'&&tilePlacementString.charAt(3)=='5'))
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',0)==1)
+                exits++;
+        }
+        if(tilePlacementString.charAt(2)=='G'&&tilePlacementString.charAt(3)=='3')
+        {
+            if(getvalue(tilePlacementString,tilePlacementString.charAt(4)-'0',0)==2)
+                exits++;
+        }
+
+        if(exits==0)
+            return false;
+        return true;
+    }
     public static boolean isValidPlacementSequence(String boardString) {
         // FIXME Task 6: determine whether the given placement sequence is valid
-        return false;
+        if(isBoardStringWellFormed(boardString)==false)return false;
+        int i = 0;
+        while (i < boardString.length() - 5) {
+
+            if (isTilePlacementWellFormed(boardString.substring(i, i + 5)) == false)
+                return false;
+
+            if(connectToAnExit(boardString.substring(i,i+5))==true)
+            {
+                //System.out.println("connectToAnExit ok");
+                i=i+5;
+                continue;
+            }
+            boolean flag=false;
+            int j=0;
+            while(j<i)
+            {
+                if(areConnectedNeighbours(boardString.substring(j, j+5),boardString.substring(i, i+5))==true)
+                    flag=true;
+                j=j+5;
+            }
+            if(flag==false)return false;
+            i=i+5;
+        }
+
+        return true;
     }
 
     /**

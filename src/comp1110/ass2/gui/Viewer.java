@@ -33,6 +33,9 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement) {
         // FIXME Task 4: implement the simple placement viewer
+
+
+
     }
 
     /**
