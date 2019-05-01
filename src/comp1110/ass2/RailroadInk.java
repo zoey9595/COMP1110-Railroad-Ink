@@ -1,5 +1,7 @@
 package comp1110.ass2;
 
+import java.util.Random;
+
 public class RailroadInk {
     /**
      * Determine whether a tile placement string is well-formed:
@@ -354,8 +356,57 @@ public class RailroadInk {
      * @return a String representing the die roll e.g. A0A4A3B2
      */
     public static String generateDiceRoll() {
+
+        String[] dice = new String[8];
+        int min = 0;
+        int max = 7;
+        Random rand = new Random();
+
+        // Random select an index from (0, 2, 4, 6) for Die B
+        int index = rand.nextInt(max-min+1)/2;
+        index = index*2;
+        dice[index] = "B";
+
+        // Put Die A in other indexes
+        if(index == 0){
+            dice[2] = "A";
+            dice[4] = "A";
+            dice[6] = "A";
+        }else if(index == 2){
+            dice[0] = "A";
+            dice[4] = "A";
+            dice[6] = "A";
+        }else if(index == 4){
+            dice[0] = "A";
+            dice[2] = "A";
+            dice[6] = "A";
+        }else if(index == 6){
+            dice[0] = "A";
+            dice[4] = "A";
+            dice[2] = "A";
+        }
+
+        // Ramdom create integer numbers for Die A or Die B
+        for(int i=0; i<8; i=i+2){
+            if (dice[i] == "A") {
+                max = 5;
+                int randomNumber = (int)(Math.random()*6);
+                dice[i+1] = String.valueOf(randomNumber);
+            }else{
+                max = 2;
+                int randomNumber = (int)(Math.random()*3);
+                dice[i+1] = String.valueOf(randomNumber);
+            }
+        }
+
+        // Transfer String[] to String
+        StringBuffer transfer = new StringBuffer();
+        for(int j=0; j<dice.length; j++){
+            transfer.append(dice[j]);
+        }
+        String randomDiceRoll = transfer.toString();
         // FIXME Task 7: generate a dice roll
-        return "";
+        return randomDiceRoll;
     }
 
     /**
