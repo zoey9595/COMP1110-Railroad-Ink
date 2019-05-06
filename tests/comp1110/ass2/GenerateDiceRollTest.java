@@ -66,7 +66,6 @@ public class GenerateDiceRollTest {
 
     @Test
     public void testDieFaces() {
-        Object blah;
         int zero = 0;
         int one = 0;
         int two = 0;
