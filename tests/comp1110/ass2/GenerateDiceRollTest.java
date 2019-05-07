@@ -12,7 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 public class GenerateDiceRollTest {
 
-    private static int BASE_ITERATIONS = 100;
+    private static int BASE_ITERATIONS = 10000;
 
     @Rule
     public Timeout globalTimeout = Timeout.millis(2000);
@@ -80,16 +80,22 @@ public class GenerateDiceRollTest {
                 switch (face) {
                     case 0:
                         zero++;
+                        break;
                     case 1:
                         one++;
+                        break;
                     case 2:
                         two++;
+                        break;
                     case 3:
                         three++;
+                        break;
                     case 4:
                         four++;
+                        break;
                     case 5:
                         five++;
+                        break;
                 }
                 assertFalse("Expected a number between 0 and 5, but you rolled: " + face, face < 0 || face > 5);
             }
