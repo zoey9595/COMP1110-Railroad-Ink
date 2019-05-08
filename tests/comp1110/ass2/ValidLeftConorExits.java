@@ -3,16 +3,15 @@ package comp1110.ass2;
 
 
 import org.junit.*;
-import org.junit.rules.Timeout;
+
 
 import static org.junit.Assert.*;
 
 public class ValidLeftConorExits {
-    @Rule
-    public Timeout globalTimeout = Timeout.millis(2000);
+
 
     @Test
-    public void testJavadocExamples() {
+    public void testExamples() {
         testExpected("S0B01",  true);
         testExpected("S1B03",  false);
 
@@ -26,7 +25,7 @@ public class ValidLeftConorExits {
 
     @Test
     public void testInvalidLeftConorExits() {
-        testTrivialCorrect();
+
         for (String[] invalid : INVALID) {
             testExpected(invalid[0],  false);
         }
@@ -65,9 +64,7 @@ public class ValidLeftConorExits {
     };
 
 
-    private void testTrivialCorrect() {
-        testExpected("S0B01",  true);
-    }
+
     private void testExpected(String tilePlacementString, boolean expected) {
         boolean result = RailroadInk.connectToAnExit(tilePlacementString);
         assertTrue("RailroadInk.connectToAnExit(" + tilePlacementString + ") expected " + expected + " but returned " + result, result == expected);
