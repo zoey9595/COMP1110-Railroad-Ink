@@ -177,14 +177,13 @@ public class RailroadInk {
         int valueB=getvalue(tilePlacementStringB,tilePlacementStringB.charAt(4)-'0',indexB);
         // whether the connection exists, and the connection type is the same one
         if(valueA==0 || valueB==0) return false;
-        if(valueA == valueB) return true;
-        return false;
+        return (valueA == valueB);
     }
 
     /**
      * Check whether there is a connection between two tiles
-     * @param tilePlacementStringA
-     * @param tilePlacementStringB
+     * @param tilePlacementStringA the first tile
+     * @param tilePlacementStringB the second tile
      * @return true if two tiles are neighbour but have no connection
      */
     public static boolean validNeighbourNoConnection(String tilePlacementStringA, String tilePlacementStringB){
@@ -212,10 +211,7 @@ public class RailroadInk {
         int valueA=getvalue(tilePlacementStringA,tilePlacementStringA.charAt(4)-'0',indexA);
         int valueB=getvalue(tilePlacementStringB,tilePlacementStringB.charAt(4)-'0',indexB);
 
-        if(valueA==0 || valueB==0){
-            return true;
-        }
-        return false;
+        return (valueA==0 || valueB==0);
     }
 
     /*
@@ -380,14 +376,10 @@ public class RailroadInk {
 
             // Check whether the tile can connect with any other tile before
             int j=0;
-            int mark = 0;
             while(j<i) {
                 if(areNeighbours(boardString.substring(j,j+5), boardString.substring(i,i+5))>=0) {
-                    if (areConnectedNeighbours(boardString.substring(j,j+5), boardString.substring(i,i+5))) {
-                        mark++;
-                    }else{
-                        // 有两种情况，一是两个之间没有连接，所以是有效的，应该继续循环；
-                        // 二是两个之间连接是不同类型，应该直接返回false
+                    if (!areConnectedNeighbours(boardString.substring(j,j+5), boardString.substring(i,i+5))) {
+                        // Check whether two tiles have valid placement but no connection
                         if(!validNeighbourNoConnection(boardString.substring(j,j+5), boardString.substring(i,i+5))){
                             return false;
                         }
@@ -396,28 +388,17 @@ public class RailroadInk {
                 j=j+5;
                 if(j==i){
                     i=i+5;
+                    // If the tile is all checked, return true
                     if (i == boardString.length()) {
                         return true;
                     }
                     continue loop;
                 }
-                /*if (areConnectedNeighbours(boardString.substring(j,j+5), boardString.substring(i,i+5))) {
-                    i=i+5;
-                    if (i == boardString.length()) {
-                        return true;
-                    }
-                    continue loop;
-                }else if(areNeighbours(boardString.substring(j,j+5), boardString.substring(i,i+5))<0) {
-                    j=j+5;
-                }else if(areNeighbours(boardString.substring(j,j+5), boardString.substring(i,i+5))>=0 &&) {
-                    return false;
-                }*/
             }
             // A tile is invalid if neither connect to an exit nor a tile
             return false;
         }
         return true;
-
     }
 
     /**
@@ -432,61 +413,11 @@ public class RailroadInk {
      */
     public static String generateDiceRoll() {
 
-        /*String[] dice = new String[8];
-        int min = 0;
-        int max = 7;
-        Random rand = new Random();
-
-        // Random select an index from (0, 2, 4, 6) for Die B
-        int index = rand.nextInt(max-min+1)/2;
-        index = index*2;
-        dice[index] = "B";
-
-        // Put Die A in other indexes
-        if(index == 0){
-            dice[2] = "A";
-            dice[4] = "A";
-            dice[6] = "A";
-        }else if(index == 2){
-            dice[0] = "A";
-            dice[4] = "A";
-            dice[6] = "A";
-        }else if(index == 4){
-            dice[0] = "A";
-            dice[2] = "A";
-            dice[6] = "A";
-        }else if(index == 6){
-            dice[0] = "A";
-            dice[4] = "A";
-            dice[2] = "A";
-        }
-
-        // Ramdom create integer numbers for Die A or Die B
-        for(int i=0; i<8; i=i+2){
-            if (dice[i] == "A") {
-                max = 5;
-                int randomNumber = (int)(Math.random()*6);
-                dice[i+1] = String.valueOf(randomNumber);
-            }else{
-                max = 2;
-                int randomNumber = (int)(Math.random()*3);
-                dice[i+1] = String.valueOf(randomNumber);
-            }
-        }
-
-        // Transfer String[] to String
-        StringBuffer transfer = new StringBuffer();
-        for(int j=0; j<dice.length; j++){
-            transfer.append(dice[j]);
-        }
-        String randomDiceRoll = transfer.toString();
-        return randomDiceRoll;*/
-
         String roll = "";
         Random r = new Random();
         roll = "A" + r.nextInt(6) + "A" + r.nextInt(6) + "A" + r.nextInt(6) + "B" + r.nextInt(3);
-        return roll;
         // FIXME Task 7: generate a dice roll
+        return roll;
     }
 
     static class Node {
