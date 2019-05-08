@@ -117,8 +117,8 @@ public class GenerateDiceRollTest {
         int samples = BASE_ITERATIONS;
         double chiA = chiSquared(probsA, samples * 3, countsA);
         double chiB = chiSquared(probsB, samples, countsB);
-        assertTrue("Distribution of A rolls don't appear to be uniform (chi squared value of " + chiA + ")", chiA < 5);
-        assertTrue("Distribution of B rolls don't appear to be uniform (chi squared value of " + chiB + ")", chiB < 5);
+        assertTrue("Distribution of A rolls don't appear to be uniform (chi squared value of " + chiA + ")", chiA < 14.45);
+        assertTrue("Distribution of B rolls don't appear to be uniform (chi squared value of " + chiB + ")", chiB < 9.35);
     }
 
 
