@@ -8,8 +8,8 @@ import static org.junit.Assert.assertTrue;
 
 public class GetBasicScoreTest {
 
-    @Rule
-    public Timeout globalTimeout = Timeout.millis(2000);
+    //@Rule
+    //public Timeout globalTimeout = Timeout.millis(2000);
 
     /**
      * Score:

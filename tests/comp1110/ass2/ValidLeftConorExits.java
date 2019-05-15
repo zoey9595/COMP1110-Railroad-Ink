@@ -66,7 +66,7 @@ public class ValidLeftConorExits {
 
 
     private void testExpected(String tilePlacementString, boolean expected) {
-        boolean result = RailroadInk.connectToAnExit(tilePlacementString);
+        boolean result = RailroadInk.connectToAnExit(tilePlacementString)>=0;
         assertTrue("RailroadInk.connectToAnExit(" + tilePlacementString + ") expected " + expected + " but returned " + result, result == expected);
 
     }
