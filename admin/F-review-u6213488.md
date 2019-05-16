@@ -32,4 +32,6 @@ Review:
   The best feature of this code is it is really readable and clearly determined 
   whether the provided placements are neighbours connected by at least one 
   validly connecting edge. The code is well-documented. The structure is logical.
-  It does follow 
+  It does follow Java code conventions and the style is consistent throughout so 
+  it is easy to understand. I do not find errors in these codes so I think it is 
+  perfect I think.
