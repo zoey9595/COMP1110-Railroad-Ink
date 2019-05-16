@@ -27,3 +27,9 @@
     }
     
     Author: Jiang Huhan
+    
+Review:
+  The best feature of this code is it is really readable and clearly determined 
+  whether the provided placements are neighbours connected by at least one 
+  validly connecting edge. The code is well-documented. The structure is logical.
+  It does follow 
