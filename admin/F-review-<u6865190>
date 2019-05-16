@@ -1,5 +1,43 @@
 Yuqing Zhai(u6865190) review the task 3 code from Yufan Zhou. 
 
+ public static boolean isBoardStringWellFormed(String boardString) {
+
+        // whether a board string is null or empty
+        if(boardString == null || boardString == ""){
+            return false;
+        }
+
+        // whether a board string has exactly N five-character tile placements, and not too long
+        if(boardString.length()%5 != 0) {
+            return false;
+        }else if(boardString.length()/5 > 31){
+            return false;
+        }
+
+        int count = 0;
+        for(int i=0; i<boardString.length(); i+=5){
+            // slice the board string into a single one
+            String newString = boardString.substring(i,i+4);
+            char margin = boardString.charAt(i+4);
+            newString = newString + margin;
+            // test whether it is well performed
+            if(!isTilePlacementWellFormed(newString)){
+                return false;
+            }
+            // count the number of special pieces
+            if(newString.charAt(0) == 'S'){
+                count++;
+            }
+        }
+
+        // if special pieces is more than 3 then it is not valid
+        if(count >= 3){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
 1. What are the best features of this code?
 
 This code uses basic if and for loop, so there is no repeating code. And the loop is well-formed so there is no double check, which saves running time.
