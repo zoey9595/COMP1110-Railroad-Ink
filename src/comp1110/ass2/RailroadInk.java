@@ -511,9 +511,9 @@ public class RailroadInk {
         return nums;
     }
 
-    // 多个组
+    // several groups
     static ArrayList<String> group=new ArrayList<String>();
-    //每个组包含的出口个数
+    //exists of every groups
     //static int[] exits=new int[64];
     static HashMap<String, Node> mapNode = new HashMap<String, Node>();
 
@@ -529,7 +529,7 @@ public class RailroadInk {
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * 将所有节点根据是否组成路线，分组
+     * All nodes are grouped according to whether or not they form a route
      */
     static void getGroups(String boardString)
     {
@@ -554,10 +554,10 @@ public class RailroadInk {
             if(temp.charAt(3)=='6')node.direction[1]=0;
             if(temp.charAt(2)=='G')node.direction[2]=0;
             if(temp.charAt(3)=='0')node.direction[3]=0;
-            int find=0;//是否找到相邻的组
-            int findGroup=-1;//找到的第一个组
-            int nodeExits=-1;//是否连接出口
-            int neighbour=-1;//在已存在节点的哪个方向
+            int find=0;//是否找到相邻的组wether find the neighbour group
+            int findGroup=-1;//找到的第一个组find the first group
+            int nodeExits=-1;//是否连接出口wehter conect exist
+            int neighbour=-1;//在已存在节点的哪个方向which direction of the node
             nodeExits=connectToAnExit(temp);
             if(nodeExits>=0)node.direction[nodeExits]=-1;
             for(int j=0;j<group.size();j++)
@@ -577,30 +577,30 @@ public class RailroadInk {
                 {
                     if(findGroup==-1)
                     {
-                        //邻近B2放入，
+                        //邻近B2放入，put in Near B2 
                         if(neighPlace.charAt(0)=='B'&&neighPlace.charAt(1)=='2')
                         {
-                            //判断一个路径上是否存在已有节点，如果没有新建group
+                            //判断一个路径上是否存在已有节点，如果没有新建groupDetermines whether an existing node exists on a path, if no new group is created
                             if(mapNode.get(neighPlace).direction[(neighbour+2)%4]==-2)
                             {
                                 findGroup=j;
                                 group.add(temp+neighPlace);
-                                //设置两个节点四周连接状态
+                                //设置两个节点四周连接状态Sets the connection state around two nodes
                                 node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                                 mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                                 j++;
                             }
                             else
                             {
-                                //判断与B2相邻的节点是否属于改组
+                                //判断与B2相邻的节点是否属于改组Determine whether the node adjacent to B2 belongs to reorganization
                                 for(int qq=0;qq+4<group.get(j).length();qq=qq+5)
                                 {
                                     if(areNeighbours(group.get(j).substring(qq,qq+5),neighPlace)==(neighbour+2)%4)
                                     {
-                                        //移入该组
+                                        //移入该组move to this group
                                         findGroup=j;
                                         group.set(j,group.get(j).concat(temp));
-                                        //设置两个节点四周连接状态
+                                        //设置两个节点四周连接状态Sets the connection state around two nodes
                                         node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                                         mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                                         j=group.size();
@@ -611,10 +611,10 @@ public class RailroadInk {
                         }
                         else
                         {
-                            //移入该组
+                            //移入该组move to this group 
                             findGroup=j;
                             group.set(j,group.get(j).concat(temp));
-                            //设置两个节点四周连接状态
+                            //设置两个节点四周连接状态Sets the connection state around two nodes
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                             //exits[j]+=nodeExits;
@@ -622,12 +622,12 @@ public class RailroadInk {
                     }
                     else
                     {
-                        //B2 放入，各个组都需要添加
+                        //B2 放入，各个组都需要添加put in b2 for everyfroup
                         if(temp.charAt(0)=='B'&&temp.charAt(1)=='2')
                         {
                             //移入该组
                             group.set(j,group.get(j).concat(temp));
-                            //设置两个节点四周连接状态
+                            //设置两个节点四周连接状态Sets the connection state around two nodes
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                         }
@@ -639,7 +639,7 @@ public class RailroadInk {
                             {
                                 //      exits[p]=exits[p+1];
                             }
-                            //设置两个节点四周连接状态
+                            //设置两个节点四周连接状态Sets the connection state around two nodes
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
 
@@ -670,7 +670,7 @@ public class RailroadInk {
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * 设置地图
+     * 设置地图set map
      */
     static void setMap(String boardString) {
         for (int i = 0; i < 7; i++) {
@@ -750,7 +750,7 @@ public class RailroadInk {
     public static int getAdvancedScore(String boardString) {
         // FIXME Task 12: compute the total score including bonus points
         int ans=getBasicScore(boardString);
-        //分析groups的多个路线最长路径
+        //分析groups的多个路线最长路径Analyze the longest paths of multiple paths of groups
         int longrailway=0;
         int longhighway=0;
         for(int i=0;i<group.size();i++)

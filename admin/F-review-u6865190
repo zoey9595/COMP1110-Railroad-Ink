@@ -1,0 +1,61 @@
+Yuqing Zhai(u6865190) review the task 3 code from Yufan Zhou. 
+
+ public static boolean isBoardStringWellFormed(String boardString) {
+
+        // whether a board string is null or empty
+        if(boardString == null || boardString == ""){
+            return false;
+        }
+
+        // whether a board string has exactly N five-character tile placements, and not too long
+        if(boardString.length()%5 != 0) {
+            return false;
+        }else if(boardString.length()/5 > 31){
+            return false;
+        }
+
+        int count = 0;
+        for(int i=0; i<boardString.length(); i+=5){
+            // slice the board string into a single one
+            String newString = boardString.substring(i,i+4);
+            char margin = boardString.charAt(i+4);
+            newString = newString + margin;
+            // test whether it is well performed
+            if(!isTilePlacementWellFormed(newString)){
+                return false;
+            }
+            // count the number of special pieces
+            if(newString.charAt(0) == 'S'){
+                count++;
+            }
+        }
+
+        // if special pieces is more than 3 then it is not valid
+        if(count >= 3){
+            return false;
+        }else{
+            return true;
+        }
+    }
+
+1. What are the best features of this code?
+
+This code uses basic if and for loop, so there is no repeating code. And the loop is well-formed so there is no double check, which saves running time.
+
+2. Is the code well-documented?
+
+Yes, this code is well-document.
+
+3. Is the program decomposition (class and method structure) appropriate?
+
+Yes, this code use previous methods like isTilePlacementWellFormed() appropriate to save running time.
+
+4. Does it follow Java code conventions (for example, are methods and variables properly named), and is the style consistent throughout?
+
+Yes, this code follows the Java code conventions and the sytle consistent through out, so it is easy to read. 
+
+5. If you suspect an error in the code, suggest a particular situation in which the program will not function correctly.
+
+I think there is no error in this code. The only thing I think can improve is that the last if statement can be simpler.
+We can use only one line to return a boolean, like below:
+return !(count>=3);
