@@ -1,29 +1,25 @@
 package comp1110.ass2.gui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.shape.StrokeType;
 import javafx.scene.text.Font;
-import javafx.scene.transform.Rotate;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
-import java.io.FileInputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import static comp1110.ass2.RailroadInk.generateDiceRoll;
-import static comp1110.ass2.RailroadInk.isTilePlacementWellFormed;
+import static comp1110.ass2.RailroadInk.*;
 
 /**
  * Author: Yuqing Zhai
@@ -45,13 +41,187 @@ public class Viewer extends Application {
     private final Group controls = new Group();
     private final Group board = new Group();
     private final Group tiles = new Group();
-    private final Group drop = new Group();
+    private final Group randomDice = new Group();
+    private final Group setUpDice = new Group();
+    private final Group specialDices = new Group();
+    private final Group scores = new Group();
 
     TextField textField;
-    String[] tilePlacements = new String[1000];
+    int countNum = 0;
+    StringBuilder stringBuilder = new StringBuilder();
+    private final Text completionText = new Text("Well done!");
+
+    class FXPiece extends ImageView {
+
+        String tile;
+
+        /**
+         * Construct a tile with a matching picture.
+         * Set the tile size.
+         *
+         * @param tile A tile 5-character string
+         */
+        FXPiece(String tile) {
+            setImage(new Image(Viewer.class.getResource(URI_BASE + tile.substring(0,2) + ".png").toString()));
+            this.tile = tile;
+            setFitHeight(GRID_LENGTH);
+            setFitWidth(GRID_LENGTH);
+            setPickOnBounds(true);
+        }
+    }
+
+    /**
+     * This class extends FXPiece with the capacity for it to be dragged and dropped,
+     * and snap-to-grid.
+     */
+    class DraggableFXPiece extends FXPiece {
+
+        // the position in the window where the piece should be when not on the board
+        double homeX, homeY;
+        // the real-time mouse position
+        double mouseX, mouseY;
+        int rotation = 0;
+
+        /**
+         * Construct a draggable piece
+         * @param tile A tile 5-character string
+         */
+        DraggableFXPiece(String tile) {
+            super(tile);
+
+            // scroll to change orientation
+            setOnScroll(event -> {
+                this.rotate();
+                event.consume();
+            });
+
+            // mouse press indicates begin of drag
+            setOnMousePressed(event -> {
+                mouseX = event.getSceneX();
+                mouseY = event.getSceneY();
+            });
+
+            // mouse is being dragged
+            setOnMouseDragged(event -> {
+                double movementX = event.getSceneX() - mouseX;
+                double movementY = event.getSceneY() - mouseY;
+                this.setLayoutX(getLayoutX() + movementX);
+                this.setLayoutY(getLayoutY() + movementY);
+                mouseX = event.getSceneX();
+                mouseY = event.getSceneY();
+                event.consume();
+            });
+
+            // drag is complete
+            setOnMouseReleased(event -> {
+                snapToGrid();
+            });
+        }
+
+        /*
+         * Snap the tile to the nearest grid (if it is over the board)
+         */
+        private void snapToGrid() {
+            if(onBoard()){
+                // Reset the tile string by the location and rotation
+                int row = (int)((mouseY-50) / GRID_LENGTH);
+                char rowChar = (char) ('A' + row);
+                int col = (int)((mouseX-100) / GRID_LENGTH);
+                char colChar = (char)('0' + col);
+                //rotation = (int) (this.getRotate()/90);
+                char rot = (char)('0' + rotation);
+                changeName(rowChar,colChar,rot);
+                System.out.println("The tile is " + tile);
+
+                String temporary = stringBuilder.toString() + tile;
+                System.out.println("Temporary string is " + temporary);
+                if(isValidPlacementSequence(temporary)){
+                    // Put the tile on the nearest grid
+                    setLayoutY(50+row*GRID_LENGTH);
+                    setLayoutX(100+col*GRID_LENGTH);
+
+                    setUpUsedTiles();
+                    randomDice.getChildren().remove(this);
+
+                    stringBuilder.append(tile);
+                    System.out.println("This connection is valid, and the boardstring is " + stringBuilder + " right now.");
+                }else {
+                    System.out.println("This connection is invalid.");
+                    snapToHome();
+                }
+            }else{
+                System.out.println("This tile is not on the board.");
+                snapToHome();
+            }
+        }
+
+        // Set up the used tile to be not changed
+        private void setUpUsedTiles(){
+            ImageView i = new ImageView(this.getImage());
+            if(rotation<4) {
+                i.setRotate(rotation*90);
+            }else{
+                i.setScaleX(-1);
+                i.setRotate(rotation*90);
+            }
+            i.setFitHeight(GRID_LENGTH);
+            i.setFitWidth(GRID_LENGTH);
+            i.setLayoutY(this.getLayoutY());
+            i.setLayoutX(this.getLayoutX());
+            setUpDice.getChildren().add(i);
+        }
+
+        // Change the tile string
+        private void changeName(char row, char col, char rot){
+            this.tile = tile.substring(0,2) + row + col + rot;
+        }
+
+
+        /**
+         * @return true if the piece is on the board
+         */
+        private boolean onBoard() {
+            return mouseX <= 730 && mouseX >= 100 && mouseY <= 680 && mouseY>= 50;
+        }
+
+        /**
+         * Snap the tile to its home position (if it is not on the broad)
+         */
+        private void snapToHome() {
+            setLayoutX(homeX);
+            setLayoutY(homeY);
+            setScaleX(1);
+            setRotate(0);
+        }
+
+        /**
+         * Rotate the tile by 90 degrees.
+         */
+        private void rotate() {
+
+            if(rotation%8 < 3){
+                setRotate(getRotate() + 90);
+                rotation++;
+            }else if(rotation%8 == 3){
+                setRotate(getRotate() + 90);
+                setScaleX(-1);
+                rotation++;
+            }else if(rotation%8 < 7){
+                setRotate(getRotate()+90);
+                rotation++;
+            }else if(rotation%8 == 7){
+                setRotate(getRotate() + 90);
+                setScaleX(1);
+                rotation=0;
+            }
+            System.out.println("rotation is " + rotation);
+            System.out.println(this.getRotate());
+
+        }
+    }
 
     /*
-     * Draw a basic empty board in the window.
+     * Draw a basic empty board and entrances in the window.
      */
     private void makeBoard(){
         board.setLayoutX(100);
@@ -64,17 +234,17 @@ public class Viewer extends Application {
         inBorder.setWidth(GRID_LENGTH*3);
         inBorder.setHeight(GRID_LENGTH*3);
         inBorder.setFill(null);
-        inBorder.setStrokeWidth(5);
+        inBorder.setStrokeWidth(2);
         inBorder.setStroke(Color.RED);
 
         Rectangle outBorder = new Rectangle();
-        inBorder.setX(0);
-        inBorder.setY(0);
-        inBorder.setWidth(GRID_LENGTH*7);
-        inBorder.setHeight(GRID_LENGTH*7);
+        outBorder.setX(0);
+        outBorder.setY(0);
+        outBorder.setWidth(GRID_LENGTH*7);
+        outBorder.setHeight(GRID_LENGTH*7);
         outBorder.setFill(null);
-        inBorder.setStrokeWidth(3);
-        inBorder.setStroke(Color.BLACK);
+        outBorder.setStrokeWidth(4);
+        outBorder.setStroke(Color.BLACK);
 
         Pane p = new Pane();
 
@@ -104,8 +274,6 @@ public class Viewer extends Application {
         Image highExitImage = new Image(getClass().getResourceAsStream(URI_BASE+"HighExit.png"));
         Image railExitImage = new Image(getClass().getResourceAsStream(URI_BASE+"RailExit.png"));
 
-        //Image railExitImagenew = new Image(new FileInputStream("src/comp1110/ass2/gui/assets/RailExit.png"));
-
         ImageView[] highExit = new ImageView[6];
         ImageView[] railExit = new ImageView[6];
 
@@ -127,7 +295,6 @@ public class Viewer extends Application {
         hb1.setLayoutY(5);
         root.getChildren().add(hb1);
 
-
         HBox hb2 = new HBox();
         highExit[2].setRotate(180);
         highExit[3].setRotate(180);
@@ -137,7 +304,6 @@ public class Viewer extends Application {
         hb2.setLayoutX(190);
         hb2.setLayoutY(5+7*GRID_LENGTH);
         root.getChildren().add(hb2);
-
 
         VBox vb1 = new VBox();
         railExit[2].setRotate(270);
@@ -160,203 +326,11 @@ public class Viewer extends Application {
         root.getChildren().add(vb2);
     }
 
-
-    class FXPiece extends ImageView {
-
-        String tile;
-        //int row;
-        //int col;
-        //int rotation;
-        //List<Grid> grids = new ArrayList<>();
-
-        private Image getImageForTile(String tile) {
-            Image[] images = new Image[15];
-
-            for (int i = 0; i < 15; i++) {
-                if (i < 6) {
-                    images[i] = new Image(getClass().getResourceAsStream(URI_BASE + 'A' + i + ".png"));
-                } else if (i < 9) {
-                    images[i] = new Image(getClass().getResourceAsStream(URI_BASE + 'B' + (i - 6) + ".png"));
-                } else {
-                    images[i] = new Image(getClass().getResourceAsStream(URI_BASE + 'S' + (i - 9) + ".png"));
-                }
-            }
-
-            switch (tile) {
-                case "A0":
-                    return images[0];
-                case "A1":
-                    return images[1];
-                case "A2":
-                    return images[2];
-                case "A3":
-                    return images[3];
-                case "A4":
-                    return images[4];
-                case "A5":
-                    return images[5];
-                case "B0":
-                    return images[6];
-                case "B1":
-                    return images[7];
-                case "B2":
-                    return images[8];
-                case "S0":
-                    return images[9];
-                case "S1":
-                    return images[10];
-                case "S2":
-                    return images[11];
-                case "S3":
-                    return images[12];
-                case "S4":
-                    return images[13];
-                case "S5":
-                    return images[14];
-            }
-            return null;
-        }
-
-        /**
-         * Construct a piece at a particular place on the
-         * board at a given orientation.
-         *
-         * @param tile a five-character tile string
-         */
-        FXPiece(String tile) {
-            this.tile = tile;
-            setImage(getImageForTile(tile.substring(0, 2)));
-            //this.row = tile.charAt(2);
-            //this.col = tile.charAt(3);
-            //this.rotation = tile.charAt(4) - '0';
-            setFitHeight(GRID_LENGTH);
-            setFitWidth(GRID_LENGTH);
-        }
-    }
-
     /**
-     * This class extends FXPatch with the capacity for it to be dragged and dropped,
-     * and snap-to-grid.
+     * Draw a full placement in the window, removing any previously drawn one.
+     *
+     * @param placement A full tile placement
      */
-    class DraggableFXPiece extends FXPiece {
-
-        double homeX, homeY;         // the position in the window where the piece should be when not on the board
-        double mouseX, mouseY;
-        /**
-         * Construct a draggable piece
-         *
-         * @param tile The piece identifier ('A' - 'L')
-         */
-        DraggableFXPiece(String tile) {
-            super(tile);
-            homeX = 0;
-            homeY = 0;
-            setLayoutX(homeX);
-            setLayoutY(homeY);
-
-            setOnMousePressed(event -> {      // mouse press indicates begin of drag
-                System.out.println("pressed");
-                mouseX = event.getSceneX();
-                mouseY = event.getSceneY();
-            });
-
-            setOnMouseDragged(event -> {      // mouse is being dragged
-                toFront();
-                double movementX = event.getSceneX() - mouseX;
-                double movementY = event.getSceneY() - mouseY;
-                setLayoutX(getLayoutX() + movementX);
-                setLayoutY(getLayoutY() + movementY);
-                //drag(movementX, movementY);
-                mouseX = event.getSceneX();
-                mouseY = event.getSceneY();
-                event.consume();
-                System.out.println(getLayoutX());
-            });
-
-            setOnMouseReleased(event -> {     // drag is complete
-                System.out.println("released");
-                snapToGrid();
-            });
-
-            /* event handlers */
-            setOnScroll(event -> {            // scroll to change orientation
-                event.consume();
-            });
-
-        }
-
-        protected void drag(double movementX, double movementY){
-            setLayoutX(getLayoutX() + movementX);
-            setLayoutY(getLayoutY() + movementY);
-        }
-
-        /*
-         * Snap the piece to the nearest grid position (if it is over the grid)
-         */
-        private void snapToGrid() {
-            if(onBoard()){
-                setLayoutX(100 + 5 * GRID_LENGTH);
-                setLayoutY(50 + 5 * GRID_LENGTH);
-            }else{
-                snapToHome();
-            }
-        }
-
-
-        /**
-         * @return true if the piece is on the board
-         */
-        private boolean onBoard() {
-            return getLayoutX() > (VIEWER_HEIGHT - 730) && (getLayoutX() < 100)
-                    && getLayoutY() > (VIEWER_HEIGHT - 680) && (getLayoutY() < 50);
-        }
-
-        /**
-         * Snap the piece to its home position (if it is not on the grid)
-         */
-        private void snapToHome() {
-            setLayoutX(homeX);
-            setLayoutY(homeY);
-            setRotate(0);
-            //piecePlacements[piece.ordinal()] = IQStars.NOT_PLACED;
-            //setOpacity(1.0);
-        }
-
-        /**
-         * Rotate the piece by 60 degrees.
-         */
-        /*private void rotate() {
-            rotation = (rotation + 1) % 6;
-            updateRotation();
-        }*/
-
-        /**
-         * Determine the grid-position of the origin of the piece (0 .. 12)
-         * or -1 if it is off the grid, taking into account its rotation.
-         */
-        private void setPosition() {
-            //row = (int) ((getLayoutY()-50)/90);
-            //double xOffset = row % 2 == 0 ? 0 : 0.5;
-            //col = (int) ((getLayoutX()-100)/90);
-        }
-
-        /**
-         * @return the piece placement represented as a string
-         */
-        public String toString() {
-            return "" + tilePlacements;
-        }
-    }
-
-
-    private String getPlacementString() {
-        StringBuilder sb = new StringBuilder();
-        for (String tilePlacementString : tilePlacements) {
-            sb.append(tilePlacementString);
-        }
-        return sb.toString();
-    }
-
     void makePlacement(String placement){
 
         tiles.getChildren().clear();
@@ -364,9 +338,9 @@ public class Viewer extends Application {
         for(int i=0;i<placement.length();i=i+5){
             String placementSegment = placement.substring(i,i+5);
             makeOnePlacement(placementSegment);
-
         }
     }
+
     /**
      * Draw a placement in the window, removing any previously drawn one
      *
@@ -400,42 +374,170 @@ public class Viewer extends Application {
         // FIXME Task 4: implement the simple placement viewer
     }
 
-    private void makeTiles(){
+    /**
+     * Set 6 special dices, only 3 can be used in the game.
+     */
+    private void setSpecialDices(){
+        specialDices.getChildren().clear();
+
+        specialDices.setLayoutX(VIEWER_WIDTH-GRID_LENGTH*1.25);
+        specialDices.setLayoutY(40);
+
+        Rectangle border = new Rectangle();
+        border.setHeight(40 + GRID_LENGTH * 6 + 20*5);
+        border.setWidth(GRID_LENGTH+12);
+        border.setLayoutX(-3);
+        border.setLayoutY(-3);
+        border.setFill(null);
+        border.setStrokeWidth(3);
+        border.setStroke(Color.SILVER);
+
+        Label label = new Label("Special Tiles");
+        label.setFont(new Font("American Typewriter", 16));
+
+        String[] specialTilePlacements = new String[6];
+        DraggableFXPiece[] draggableSpeicalTiles = new DraggableFXPiece[6];
+
+        for(int i=0;i<6;i++){
+            specialTilePlacements[i] = "S"+ (char)('0'+i) +"A00";
+            draggableSpeicalTiles[i] = new DraggableFXPiece(specialTilePlacements[i]);
+            draggableSpeicalTiles[i].homeX = 4;
+            draggableSpeicalTiles[i].homeY = 30 + GRID_LENGTH * i + 20*i;
+            draggableSpeicalTiles[i].setLayoutX(4);
+            draggableSpeicalTiles[i].setLayoutY(30 + GRID_LENGTH * i + 20*i);
+        }
+
+        specialDices.getChildren().addAll(border,label,draggableSpeicalTiles[0], draggableSpeicalTiles[1],
+                draggableSpeicalTiles[2], draggableSpeicalTiles[3], draggableSpeicalTiles[4], draggableSpeicalTiles[5]);
+    }
+
+    /**
+     *  Make the dice can be dragged and draw them on the right side of the board.
+     */
+    private void generateRandomTiles(){
+
+        randomDice.getChildren().clear();
+
+        randomDice.setLayoutX(VIEWER_WIDTH-GRID_LENGTH*2.5);
+        randomDice.setLayoutY(40);
+
+        Rectangle border = new Rectangle();
+        border.setHeight(GRID_LENGTH * 4 + 20*5.5);
+        border.setWidth(GRID_LENGTH+8);
+        border.setLayoutX(-3);
+        border.setLayoutY(-3);
+        border.setFill(null);
+        border.setStrokeWidth(3);
+        border.setStroke(Color.SILVER);
+
+        Label label = new Label("     Tiles");
+        label.setFont(new Font("American Typewriter", 18));
+
+        String s = generateDiceRoll();
+        String[] tilePlacements = new String[4];
+        DraggableFXPiece[] draggableTiles = new DraggableFXPiece[4];
+
+        tilePlacements[0] = s.substring(0,2)+"A00";
+        tilePlacements[1] = s.substring(2,4)+"A00";
+        tilePlacements[2] = s.substring(4,6)+"A00";
+        tilePlacements[3] = s.substring(6)+"A00";
+
+        for(int i=0; i<4; i++) {
+            draggableTiles[i] = new DraggableFXPiece(tilePlacements[i]);
+            draggableTiles[i].homeY = 30 + GRID_LENGTH * i + 20*i;
+            draggableTiles[i].setLayoutY(30 + GRID_LENGTH * i + 20*i);
+        }
+
+        randomDice.getChildren().addAll(border,label,draggableTiles[0], draggableTiles[1], draggableTiles[2], draggableTiles[3]);
+
+    }
+
+    /**
+     * Generate four random dices
+     */
+    private void setRandomTiles(){
         Button generator  = new Button("Generate");
-        generator.setLayoutX(600);
+        generator.setLayoutX(660);
         generator.setLayoutY(VIEWER_HEIGHT - 50);
 
         generator.setOnAction(e -> {
-
-            drop.getChildren().clear();
-
-            Label label = new Label("   Tiles:");
-            label.setFont(new Font("American Typewriter", 20));
-
-            String s = generateDiceRoll();
-            DraggableFXPiece[] tiles = new DraggableFXPiece[4];
-            String[] orginaldices = new String[4];
-
-            orginaldices[0] = s.substring(0,2)+"000";
-            orginaldices[1] = s.substring(2,4)+"000";
-            orginaldices[2] = s.substring(4,6)+"000";
-            orginaldices[3] = s.substring(6)+"000";
-
-            for(int i=0; i<4; i++) {
-                tiles[i] = new DraggableFXPiece(orginaldices[i]);
-                System.out.println(orginaldices[i]);
+            countNum++;
+            System.out.println(countNum);
+            if (countNum < 8) {
+                generateRandomTiles();
+            }else{
+                getScore();
+                showCompletion();
             }
-
-            VBox vb = new VBox();
-            vb.setBorder(new Border(new BorderStroke(Color.BLACK, BorderStrokeStyle.SOLID, new CornerRadii(10), new BorderWidths(3))));
-            vb.setSpacing(15);
-            vb.setLayoutX(VIEWER_WIDTH-GRID_LENGTH-100);
-            vb.setLayoutY(50);
-            vb.getChildren().addAll(label,tiles[0], tiles[1], tiles[2], tiles[3]);
-            drop.getChildren().add(vb);
         });
 
         root.getChildren().add(generator);
+    }
+
+    /**
+     * Count the score
+     */
+    private void getScore(){
+
+        scores.getChildren().clear();
+
+        scores.setLayoutX(VIEWER_WIDTH-GRID_LENGTH*2.5);
+        scores.setLayoutY(GRID_LENGTH*6-3);
+
+        int scoreNum = getBasicScore(stringBuilder.toString());
+        //getAdvancedScore(stringBuilder.toString());
+
+        Rectangle border = new Rectangle();
+        border.setHeight(GRID_LENGTH*2);
+        border.setWidth(GRID_LENGTH);
+        border.setFill(null);
+        border.setStrokeWidth(3);
+        border.setStroke(Color.RED);
+
+        Label label1 = new Label("SCORE");
+        label1.setFont(new Font("American Typewriter", 22));
+        label1.setLayoutX(10);
+        label1.setLayoutY(10);
+
+        Label label2 = new Label( "" + scoreNum);
+        label2.setFont(new Font("American Typewriter", 40));
+        label2.setLayoutX(34);
+        label2.setLayoutY(82);
+
+        scores.getChildren().addAll(border,label1,label2);
+    }
+
+    /**
+     * Create the message to be displayed when the player completes the puzzle.
+     */
+    private void makeCompletion() {
+        DropShadow ds = new DropShadow();
+        ds.setOffsetY(4.0f);
+        ds.setColor(Color.color(0.4f, 0.4f, 0.4f));
+        completionText.setFill(Color.RED);
+        completionText.setEffect(ds);
+        completionText.setCache(true);
+        completionText.setFont(Font.font("American Typewriter", FontWeight.EXTRA_BOLD, 80));
+        completionText.setLayoutX(VIEWER_WIDTH / 2.0 - 200);
+        completionText.setLayoutY(350);
+        completionText.setTextAlignment(TextAlignment.CENTER);
+        root.getChildren().add(completionText);
+    }
+
+    /**
+     * Show the completion message
+     */
+    private void showCompletion() {
+        completionText.toFront();
+        completionText.setOpacity(1);
+    }
+
+    /**
+     * IQStars the completion message
+     */
+    private void hideCompletion() {
+        completionText.toBack();
+        completionText.setOpacity(0);
     }
 
     /**
@@ -450,13 +552,39 @@ public class Viewer extends Application {
             makePlacement(textField.getText());
             textField.clear();
         });
+        Button button2 = new Button("New Game");
+        button2.setOnAction(e -> {
+            newGame();
+        });
         HBox hb = new HBox();
-        hb.getChildren().addAll(label1, textField, button);
+        hb.getChildren().addAll(label1, textField, button2, button);
         hb.setSpacing(10);
-        hb.setLayoutX(130);
+        hb.setLayoutX(100);
         hb.setLayoutY(VIEWER_HEIGHT - 50);
         controls.getChildren().add(hb);
     }
+
+    /**
+     * Start a new game, resetting everything as necessary
+     */
+    private void newGame() {
+        try {
+            makePlacement("");
+            stringBuilder = new StringBuilder();
+            hideCompletion();
+            randomDice.getChildren().clear();
+            setUpDice.getChildren().clear();
+            scores.getChildren().clear();
+            setSpecialDices();
+            countNum = 0;
+
+        } catch (IllegalArgumentException e) {
+            System.err.println("Uh oh. " + e);
+            e.printStackTrace();
+            Platform.exit();
+        }
+    }
+
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -465,18 +593,22 @@ public class Viewer extends Application {
         root.getChildren().add(controls);
         root.getChildren().add(board);
         root.getChildren().add(tiles);
-        root.getChildren().add(drop);
+        root.getChildren().add(randomDice);
+        root.getChildren().add(setUpDice);
+        root.getChildren().add(specialDices);
+        root.getChildren().add(scores);
 
         makeControls();
         makeBoard();
-        makeTiles();
+        setRandomTiles();
+        setSpecialDices();
+        makeCompletion();
+        hideCompletion();
 
         primaryStage.setScene(scene);
         primaryStage.show();
     }
-
     public static void main(String[] args) {
         launch(args);
     }
 }
-
