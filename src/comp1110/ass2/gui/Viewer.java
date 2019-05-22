@@ -2,6 +2,7 @@ package comp1110.ass2.gui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,7 +11,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -45,6 +48,9 @@ public class Viewer extends Application {
     private final Group setUpDice = new Group();
     private final Group specialDices = new Group();
     private final Group scores = new Group();
+    private final Group basic = new Group();
+    private final Group computer = new Group();
+
 
     TextField textField;
     int countNum = 0;
@@ -458,7 +464,7 @@ public class Viewer extends Application {
      */
     private void setRandomTiles(){
         Button generator  = new Button("Generate");
-        generator.setLayoutX(660);
+        generator.setLayoutX(510);
         generator.setLayoutY(VIEWER_HEIGHT - 50);
 
         generator.setOnAction(e -> {
@@ -472,7 +478,8 @@ public class Viewer extends Application {
             }
         });
 
-        root.getChildren().add(generator);
+        //root.getChildren().add(generator);
+        controls.getChildren().add(generator);
     }
 
     /**
@@ -502,8 +509,8 @@ public class Viewer extends Application {
 
         Label label2 = new Label( "" + scoreNum);
         label2.setFont(new Font("American Typewriter", 40));
-        label2.setLayoutX(34);
-        label2.setLayoutY(82);
+        label2.setLayoutX(24);
+        label2.setLayoutY(75);
 
         scores.getChildren().addAll(border,label1,label2);
     }
@@ -519,10 +526,10 @@ public class Viewer extends Application {
         completionText.setEffect(ds);
         completionText.setCache(true);
         completionText.setFont(Font.font("American Typewriter", FontWeight.EXTRA_BOLD, 80));
-        completionText.setLayoutX(VIEWER_WIDTH / 2.0 - 200);
+        completionText.setLayoutX(VIEWER_WIDTH / 2.0-380);
         completionText.setLayoutY(350);
         completionText.setTextAlignment(TextAlignment.CENTER);
-        root.getChildren().add(completionText);
+        board.getChildren().add(completionText);
     }
 
     /**
@@ -547,7 +554,7 @@ public class Viewer extends Application {
     private void makeControls() {
         Label label1 = new Label("Placement:");
         textField = new TextField();
-        textField.setPrefWidth(300);
+        textField.setPrefWidth(150);
         Button button = new Button("Refresh");
         button.setOnAction(e -> {
             makePlacement(textField.getText());
@@ -589,9 +596,71 @@ public class Viewer extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
         primaryStage.setTitle("StepsGame Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
-        root.getChildren().add(controls);
+
+        Scene scene2 = new Scene(computer, VIEWER_WIDTH*2, VIEWER_HEIGHT);
+
+        Scene basicScene = new Scene(basic,  VIEWER_WIDTH, VIEWER_HEIGHT);
+
+        Label title = new Label("STEPS GAME");
+        title.setLayoutX(VIEWER_WIDTH/3);
+        title.setLayoutY(VIEWER_HEIGHT/2-GRID_LENGTH*2);
+        title.setAlignment(Pos.CENTER);
+        title.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 60));
+
+        Button oneplayer = new Button("One Player");
+        oneplayer.setLayoutX(VIEWER_WIDTH/3+60);
+        oneplayer.setLayoutY(VIEWER_WIDTH/2-GRID_LENGTH-45);
+        oneplayer.setAlignment(Pos.CENTER);
+        oneplayer.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
+
+        Button vsComputer = new Button("VS Computer");
+        vsComputer.setLayoutX(VIEWER_WIDTH/3+35);
+        vsComputer.setLayoutY(VIEWER_WIDTH/2+GRID_LENGTH/2-45);
+        vsComputer.setAlignment(Pos.CENTER);
+        vsComputer.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
+
+        oneplayer.setOnAction(e->{
+
+            root.getChildren().add(controls);
+            root.getChildren().add(board);
+            root.getChildren().add(tiles);
+            root.getChildren().add(randomDice);
+            root.getChildren().add(setUpDice);
+            root.getChildren().add(specialDices);
+            root.getChildren().add(scores);
+
+            makeControls();
+            makeBoard();
+            setRandomTiles();
+            setSpecialDices();
+            makeCompletion();
+            hideCompletion();
+            primaryStage.setScene(scene);
+        });
+
+        vsComputer.setOnAction(e->{
+
+            computer.getChildren().add(controls);
+            computer.getChildren().add(board);
+            computer.getChildren().add(tiles);
+            computer.getChildren().add(randomDice);
+            computer.getChildren().add(setUpDice);
+            computer.getChildren().add(specialDices);
+            computer.getChildren().add(scores);
+
+            makeControls();
+            makeBoard();
+            setRandomTiles();
+            setSpecialDices();
+            makeCompletion();
+            hideCompletion();
+            primaryStage.setScene(scene2);
+        });
+
+        /*root.getChildren().add(controls);
         root.getChildren().add(board);
         root.getChildren().add(tiles);
         root.getChildren().add(randomDice);
@@ -604,9 +673,12 @@ public class Viewer extends Application {
         setRandomTiles();
         setSpecialDices();
         makeCompletion();
-        hideCompletion();
+        hideCompletion();*/
 
-        primaryStage.setScene(scene);
+        basic.getChildren().addAll(title,oneplayer,vsComputer);
+
+        primaryStage.setScene(basicScene);
+        //primaryStage.setScene(scene);
         primaryStage.show();
     }
     public static void main(String[] args) {
