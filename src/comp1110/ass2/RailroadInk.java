@@ -105,7 +105,7 @@ public class RailroadInk {
         }
 
         // if special pieces is more than 3 then it is not valid
-        if(count >= 3){
+        if(count > 3){
             return false;
         }else{
             return true;
@@ -269,63 +269,87 @@ public class RailroadInk {
 
     // Author: Huhan Jiang, Yuqing Zhai
     // Check whether a placement is connect to an exit
+
     public static int connectToAnExit(String tilePlacementString) {
         int exits = -1;
 
         //top 3 exits
         if ((tilePlacementString.charAt(2) == 'A' && tilePlacementString.charAt(3) == '1')
                 || (tilePlacementString.charAt(2) == 'A' && tilePlacementString.charAt(3) == '5')) {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 0) == 1) {
                 exits=0;
+            }else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 0) == 0){
+                exits=-2;
             }
         }
         if (tilePlacementString.charAt(2) == 'A' && tilePlacementString.charAt(3) == '3') {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 0) == 2) {
                 exits=0;
+            }else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 0) == 0){
+                exits=-2;
             }
         }
 
         //right 3 exits
         if ((tilePlacementString.charAt(2) == 'B' && tilePlacementString.charAt(3) == '6')
                 || (tilePlacementString.charAt(2) == 'F' && tilePlacementString.charAt(3) == '6')) {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 1) == 2) {
                 exits=1;
+            }else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 1) == 0){
+                exits=-2;
             }
         }
         if (tilePlacementString.charAt(2) == 'D' && tilePlacementString.charAt(3) == '6') {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 1) == 1) {
                 exits=1;
+            }else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 1) == 0){
+                exits=-2;
             }
         }
 
         //down 3 exits
         if ((tilePlacementString.charAt(2) == 'G' && tilePlacementString.charAt(3) == '1')
                 || (tilePlacementString.charAt(2) == 'G' && tilePlacementString.charAt(3) == '5')) {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 2) == 1) {
                 exits=2;
+            }else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 2) == 0){
+                exits=-2;
             }
         }
         if (tilePlacementString.charAt(2) == 'G' && tilePlacementString.charAt(3) == '3') {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 2) == 2) {
                 exits=2;
+            }else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 2) == 0){
+                exits=-2;
             }
         }
 
         // left 3 exits
         if ((tilePlacementString.charAt(2) == 'B' && tilePlacementString.charAt(3) == '0')
                 || (tilePlacementString.charAt(2) == 'F' && tilePlacementString.charAt(3) == '0')) {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 3) == 2) {
                 exits=3;
+            } else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 2) == 0){
+                exits=-2;
             }
         }
         if (tilePlacementString.charAt(2) == 'D' && tilePlacementString.charAt(3) == '0') {
+            exits = -3;
             if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 3) == 1) {
                 exits=3;
+            } else if (getvalue(tilePlacementString, tilePlacementString.charAt(4) - '0', 2) == 0){
+                exits=-2;
             }
         }
         return exits;
     }
-
     /**
      *  Author: Huhan Jiang, Yuqing Zhai
      *
@@ -368,9 +392,11 @@ public class RailroadInk {
         }
 
         int i=5;
+
         loop:
         while (i < boardString.length()) {
 
+            boolean status = false;
             // Check whether there are two tiles in the same grid
             int k=0;
             while(k<i) {
@@ -381,6 +407,7 @@ public class RailroadInk {
                 }
             }
 
+
             // if it connect to an exit, then continue loop
             if (connectToAnExit(boardString.substring(i,i+5)) >=0) {
                 i=i+5;
@@ -388,6 +415,8 @@ public class RailroadInk {
                     return true;
                 }
                 continue;
+            } else if (connectToAnExit(boardString.substring(i,i+5)) == -3){
+                return false;
             }
 
             // Check whether the tile can connect with any other tile before
@@ -399,20 +428,25 @@ public class RailroadInk {
                         if(!validNeighbourNoConnection(boardString.substring(j,j+5), boardString.substring(i,i+5))){
                             return false;
                         }
+                    }else{
+                        status = true;
                     }
                 }
                 j=j+5;
                 if(j==i){
-                    i=i+5;
-                    // If the tile is all checked, return true
-                    if (i == boardString.length()) {
-                        return true;
+                    if(status) {
+                        i = i + 5;
+                        // If the tile is all checked, return true
+                        if (i == boardString.length()) {
+                            return status;
+                        }
+                        continue loop;
                     }
-                    continue loop;
+                    return false;
                 }
             }
             // A tile is invalid if neither connect to an exit nor a tile
-            return false;
+            //return false;
         }
         return true;
     }
@@ -445,42 +479,42 @@ public class RailroadInk {
      * @return
      */
     public static int getBasicScore(String boardString) {
-        // FIXME Task 8: compute the basic score
         getGroups(boardString);
 
         int ans = 0;
         // Number of Exits connected to route | 2 | 3 | 4  | 5 |  6 |  7 |  8 |  9 |  10 | 11 | 12 |
         // Points Awarded                     | 4 | 8 | 12 | 16 | 20 | 24 | 28 | 32 | 36 | 40 | 45 |
-        for(int i=0;i<group.size();i++)
-        {
+        for(int i=0;i<group.size();i++){
             int exits=0;
             int error=0;
-            for(int j=0;j+4<group.get(i).length();j=j+5)
-            {
+            for(int j=0;j+4<group.get(i).length();j=j+5){
                 String temp=group.get(i).substring(j,j+5);
-                for(int k=0;k<4;k++)
-                {
+                for(int k=0;k<4;k++) {
                     if(mapNode.get(temp).direction[k]==-1) exits++;
-                    if(mapNode.get(temp).direction[k]==-2) error++;
-
+                    if(mapNode.get(temp).direction[k]==-2){
+                        error++;
+                    }
                 }
             }
-            if(exits==2)ans+=4;
-            if(exits==3)ans+=8;
-            if(exits==4)ans+=12;
-            if(exits==5)ans+=16;
-            if(exits==6)ans+=20;
-            if(exits==7)ans+=24;
-            if(exits==8)ans+=28;
-            if(exits==9)ans+=32;
-            if(exits==10)ans+=36;
-            if(exits==11)ans+=40;
-            if(exits==12)ans+=45;
+            if(exits==2) ans+=4;
+            if(exits==3) ans+=8;
+            if(exits==4) ans+=12;
+            if(exits==5) ans+=16;
+            if(exits==6) ans+=20;
+            if(exits==7) ans+=24;
+            if(exits==8) ans+=28;
+            if(exits==9) ans+=32;
+            if(exits==10) ans+=36;
+            if(exits==11) ans+=40;
+            if(exits==12) ans+=45;
+
+            //error多了两个
+            //System.out.println("route " + i + " has "+ ans + " score, then need to subtract " + error + " errors ");
             ans-=error;
         }
         //centre grid that are covered
-        ans+=getCentreGrids(boardString);
-
+        ans += getCentreGrids(boardString);
+        // FIXME Task 8: compute the basic score
         return ans;
     }
 
@@ -511,96 +545,98 @@ public class RailroadInk {
         return nums;
     }
 
-    // several groups
+    // 多个组
     static ArrayList<String> group=new ArrayList<String>();
-    //exists of every groups
-    //static int[] exits=new int[64];
+    //每个组包含的出口个数
     static HashMap<String, Node> mapNode = new HashMap<String, Node>();
 
-    static class Node
-    {
+    /**
+     * 建立Node类
+     *
+     * 内置方向数组，初始方向都设定为-2
+     */
+    static class Node{
         int[] direction=new int[4];
-        public Node()
-        {
-            for(int i=0;i<4;i++)
+        public Node() {
+            for(int i=0;i<4;i++){
                 direction[i]=-2;
+            }
         }
     }
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * All nodes are grouped according to whether or not they form a route
+     * 将所有节点根据是否组成路线，分组
      */
     static void getGroups(String boardString)
     {
         mapNode.clear();
         group.clear();
         int i=0;
-        //for(i=0;i<64;i++)
-        //{
-        //    exits[i]=0;
-        //}
-        i=0;
+
         while(i+4<boardString.length())
         {
-            Node  node=new Node();
+            Node node=new Node();
             String temp=boardString.substring(i,i+5);
-            for(int j=0;j<4;j++)
-            {
-                node.direction[j]=-2;
-                if(getvalue(temp,temp.charAt(4)-'0',j)==0)node.direction[j]=0;
+            for(int j=0;j<4;j++){
+                //node.direction[j]=-2;
+                //如果检查到这个tile四个方向存在一个没有出口，设置对应的节点这个方向是0
+                if(getvalue(temp,temp.charAt(4)-'0',j)==0) node.direction[j]=0;
             }
+            //如果在第一行，设置向上没有出口
             if(temp.charAt(2)=='A')node.direction[0]=0;
+            //如果最后一列，设置向右没有出口
             if(temp.charAt(3)=='6')node.direction[1]=0;
             if(temp.charAt(2)=='G')node.direction[2]=0;
             if(temp.charAt(3)=='0')node.direction[3]=0;
-            int find=0;//是否找到相邻的组wether find the neighbour group
-            int findGroup=-1;//找到的第一个组find the first group
-            int nodeExits=-1;//是否连接出口wehter conect exist
-            int neighbour=-1;//在已存在节点的哪个方向which direction of the node
+            int find=0;//是否找到相邻的组
+            int findGroup=-1;//找到的第一个组
+            int nodeExits=-1;//是否连接出口
+            int neighbour=-1;//在已存在节点的哪个方向
+            // 检查node是否连接出口，返回值分别是0，1，2，3，上右下左
             nodeExits=connectToAnExit(temp);
+            // 如果连接出口，设置node对应方向的方向值为-1
             if(nodeExits>=0)node.direction[nodeExits]=-1;
-            for(int j=0;j<group.size();j++)
-            {
+            for(int j=0;j<group.size();j++){
+
                 find=0;
                 String neighPlace="";
-                for(int k=0;k+4<group.get(j).length();k=k+5)
-                {
+
+                for(int k=0;k+4<group.get(j).length();k=k+5){
+                    // 检查当前块和总字符串所有块的连接情况
+                    // A在B上右下左分别返回0，1，2，3；不是neighbour返回-1
                     neighbour=areNeighbours(temp, group.get(j).substring(k,k+5));
-                    if(neighbour>=0&&areConnectedNeighbours(temp,group.get(j).substring(k,k+5)))
-                    {
+
+                    if(neighbour>=0&&areConnectedNeighbours(temp,group.get(j).substring(k,k+5))) {
                         neighPlace= group.get(j).substring(k,k+5);
-                        find=1;break;
+                        find=1;
+                        // 找到第一个连接的块就停止
+                        break;
                     }
                 }
-                if(find==1)
-                {
-                    if(findGroup==-1)
-                    {
-                        //邻近B2放入，put in Near B2 
-                        if(neighPlace.charAt(0)=='B'&&neighPlace.charAt(1)=='2')
-                        {
-                            //判断一个路径上是否存在已有节点，如果没有新建groupDetermines whether an existing node exists on a path, if no new group is created
-                            if(mapNode.get(neighPlace).direction[(neighbour+2)%4]==-2)
-                            {
+                if(find==1){
+                    if(findGroup==-1){
+                        //如果找到的相连的块是B2
+                        if(neighPlace.charAt(0)=='B'&&neighPlace.charAt(1)=='2'){
+                            //如果B2连接方向的对面没有连接路线
+                            //判断一个路径上是否存在已有节点，如果没有新建group
+                            if(mapNode.get(neighPlace).direction[(neighbour+2)%4]==-2){
                                 findGroup=j;
                                 group.add(temp+neighPlace);
-                                //设置两个节点四周连接状态Sets the connection state around two nodes
+                                //设置两个节点四周连接状态
                                 node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                                 mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                                 j++;
                             }
-                            else
-                            {
-                                //判断与B2相邻的节点是否属于改组Determine whether the node adjacent to B2 belongs to reorganization
-                                for(int qq=0;qq+4<group.get(j).length();qq=qq+5)
-                                {
-                                    if(areNeighbours(group.get(j).substring(qq,qq+5),neighPlace)==(neighbour+2)%4)
-                                    {
-                                        //移入该组move to this group
+                            //如果B2连接方向的对面已经连接了路线
+                            else{
+                                //判断与B2相邻的节点是否属于该组
+                                for(int qq=0;qq+4<group.get(j).length();qq=qq+5){
+                                    if(areNeighbours(group.get(j).substring(qq,qq+5),neighPlace)==(neighbour+2)%4){
+                                        //移入该组
                                         findGroup=j;
                                         group.set(j,group.get(j).concat(temp));
-                                        //设置两个节点四周连接状态Sets the connection state around two nodes
+                                        //设置两个节点四周连接状态
                                         node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                                         mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                                         j=group.size();
@@ -609,58 +645,42 @@ public class RailroadInk {
                                 }
                             }
                         }
+                        //如果找到的块不是B2
                         else
-                        {
-                            //移入该组move to this group 
-                            findGroup=j;
-                            group.set(j,group.get(j).concat(temp));
-                            //设置两个节点四周连接状态Sets the connection state around two nodes
-                            node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
-                            mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
-                            //exits[j]+=nodeExits;
-                        }
-                    }
-                    else
-                    {
-                        //B2 放入，各个组都需要添加put in b2 for everyfroup
-                        if(temp.charAt(0)=='B'&&temp.charAt(1)=='2')
                         {
                             //移入该组
+                            findGroup=j;
                             group.set(j,group.get(j).concat(temp));
-                            //设置两个节点四周连接状态Sets the connection state around two nodes
+                            //设置两个节点四周连接状态
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                         }
-                        else
-                        {
-                            // exits[findGroup]+=nodeExits;
-                            group.set(findGroup,group.get(findGroup)+group.get(j));
-                            // for(int p=j;p<groupLength-1;p++)
-                            {
-                                //      exits[p]=exits[p+1];
-                            }
-                            //设置两个节点四周连接状态Sets the connection state around two nodes
+                    }
+                    //如果findGroup不等于-1
+                    else{
+                        //如果当前块是B2
+                        //B2 放入，各个组都需要添加
+                        if(temp.charAt(0)=='B'&&temp.charAt(1)=='2'){
+                            //移入该组
+                            group.set(j,group.get(j).concat(temp));
+                            //设置两个节点四周连接状态
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
-
+                        }else{
+                            group.set(findGroup,group.get(findGroup)+group.get(j));
+                            //设置两个节点四周连接状态
+                            node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
+                            mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                             group.remove(j);
                         }
                     }
                 }
             }
-            if(findGroup==-1)
-            {
+            if(findGroup==-1){
                 group.add(temp);
             }
+
             i=i+5;
-
-            // for(int q=0;q<group.size();q++)
-            // {
-            //     System.out.println("group:"+group.get(q));
-            // }
-            //  System.out.println();
-
-
             mapNode.put(temp, node);
         }
     }
@@ -670,7 +690,7 @@ public class RailroadInk {
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * 设置地图set map
+     * 设置地图
      */
     static void setMap(String boardString) {
         for (int i = 0; i < 7; i++) {
@@ -750,7 +770,7 @@ public class RailroadInk {
     public static int getAdvancedScore(String boardString) {
         // FIXME Task 12: compute the total score including bonus points
         int ans=getBasicScore(boardString);
-        //分析groups的多个路线最长路径Analyze the longest paths of multiple paths of groups
+        //分析groups的多个路线最长路径
         int longrailway=0;
         int longhighway=0;
         for(int i=0;i<group.size();i++)
@@ -895,4 +915,9 @@ public class RailroadInk {
         if(ans4>max)max=ans4;
 
         return max;
-    }}
+    }
+
+    public static void main(String[] args) {
+        System.out.println(isValidPlacementSequence("A1A30A1B30A3D03B0D61A2C36A2D53A1C41B1B02A3C00A1D41B0D13A4C13S3D30A2C52B1A10A0A23A3C22A0B52S5D20B0B22A4E20A5F20A5F12A4G10A1B63A2E30B2F33S1G31"));
+    }
+}

@@ -605,19 +605,19 @@ public class Viewer extends Application {
         Scene basicScene = new Scene(basic,  VIEWER_WIDTH, VIEWER_HEIGHT);
 
         Label title = new Label("STEPS GAME");
-        title.setLayoutX(VIEWER_WIDTH/3);
+        title.setLayoutX(VIEWER_WIDTH/3-15);
         title.setLayoutY(VIEWER_HEIGHT/2-GRID_LENGTH*2);
         title.setAlignment(Pos.CENTER);
         title.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 60));
 
         Button oneplayer = new Button("One Player");
-        oneplayer.setLayoutX(VIEWER_WIDTH/3+60);
+        oneplayer.setLayoutX(VIEWER_WIDTH/3+45);
         oneplayer.setLayoutY(VIEWER_WIDTH/2-GRID_LENGTH-45);
         oneplayer.setAlignment(Pos.CENTER);
         oneplayer.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
 
         Button vsComputer = new Button("VS Computer");
-        vsComputer.setLayoutX(VIEWER_WIDTH/3+35);
+        vsComputer.setLayoutX(VIEWER_WIDTH/3+20);
         vsComputer.setLayoutY(VIEWER_WIDTH/2+GRID_LENGTH/2-45);
         vsComputer.setAlignment(Pos.CENTER);
         vsComputer.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
