@@ -129,7 +129,7 @@ public class Viewer extends Application {
                 int col = (int)((mouseX-100) / GRID_LENGTH);
                 char colChar = (char)('0' + col);
                 //rotation = (int) (this.getRotate()/90);
-                char rot = (char)('0' + rotation);
+                char rot = (char)('0' + (rotation%8));
                 changeName(rowChar,colChar,rot);
                 System.out.println("The tile is " + tile);
 
@@ -158,11 +158,11 @@ public class Viewer extends Application {
         // Set up the used tile to be not changed
         private void setUpUsedTiles(){
             ImageView i = new ImageView(this.getImage());
-            if(rotation<4) {
-                i.setRotate(rotation*90);
+            if((rotation%8)<4) {
+                i.setRotate((rotation%8)*90);
             }else{
                 i.setScaleX(-1);
-                i.setRotate(rotation*90);
+                i.setRotate((rotation%8)*90);
             }
             i.setFitHeight(GRID_LENGTH);
             i.setFitWidth(GRID_LENGTH);
@@ -212,7 +212,8 @@ public class Viewer extends Application {
             }else if(rotation%8 == 7){
                 setRotate(getRotate() + 90);
                 setScaleX(1);
-                rotation=0;
+                rotation++;
+                //rotation=0;
             }
             System.out.println("rotation is " + rotation);
             System.out.println(this.getRotate());
