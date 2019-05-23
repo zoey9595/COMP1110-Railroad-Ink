@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -165,6 +166,7 @@ public class Viewer extends Application {
         private void setUpUsedTiles(){
             ImageView i = new ImageView(this.getImage());
             if((rotation%8)<4) {
+
                 i.setRotate((rotation%8)*90);
             }else{
                 i.setScaleX(-1);
@@ -705,12 +707,42 @@ public class Viewer extends Application {
         button2.setOnAction(e -> {
             newGame();
         });
+
+        Image notice = new Image(Viewer.class.getResource(URI_BASE + "question.png").toString());
+        ImageView noticeImageView = new ImageView(notice);
+        noticeImageView.setFitHeight(30);
+        noticeImageView.setFitWidth(30);
+        Button button3 = new Button();
+        button3.setGraphic(noticeImageView);
+        button3.setOnMouseClicked(e-> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setWidth(500);
+            alert.titleProperty().set("Guide");
+            alert.headerTextProperty().set("1. Singal Player\n" +
+                    "   a. If you want to play a solo game, please directly click the generate button.\n" +
+                    "   b. Then click the generate button, and make you own move by dragging it on the board\n" +
+                    "   c. After 7 rounds generation, the final score will show!\n" +
+                    " \n" +
+                    "2. Play with the computer\n" +
+                    "   a. If you want to play with a computer, please click the VS Computer button first.\n" +
+                    "   b. Then you need to move first after click the generate button, when you finish,\n" +
+                    "      click the AI Move button, the computer will generate move.\n" +
+                    "   c. Repeat the generate action seven times, then the score will show!");
+            alert.showAndWait();
+        });
+
+        Image music = new Image(Viewer.class.getResource(URI_BASE + "music.png").toString());
+        ImageView musicImageView = new ImageView(music);
+        musicImageView.setFitHeight(30);
+        musicImageView.setFitWidth(30);
+
         HBox hb = new HBox();
         hb.getChildren().addAll(label1, textField, button2, button);
         hb.setSpacing(10);
         hb.setLayoutX(100);
         hb.setLayoutY(VIEWER_HEIGHT - 50);
         controls.getChildren().add(hb);
+        controls.getChildren().add(button3);
     }
 
     /**
