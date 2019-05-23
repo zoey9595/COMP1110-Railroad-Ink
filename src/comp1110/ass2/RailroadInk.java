@@ -776,10 +776,10 @@ public class RailroadInk {
         for(int i=0;i<group.size();i++)
         {
             int temp=getLongWay(0,i,0,2);
-            // System.out.println();
+            System.out.println();
             if(temp>longrailway) longrailway=temp;
             temp=getLongWay(0,i,0,1);
-            //    System.out.println();
+            System.out.println();
             if(temp>longhighway)longhighway=temp;
         }
         return ans+longrailway+longhighway;
@@ -795,8 +795,8 @@ public class RailroadInk {
      */
     public static int getLongWay(int ans,int groupid,int place,int find)
     {
-        int ans1=0,ans2=0,ans3=0,ans4=0,flag=0;
-        if(place>=group.get(groupid).length())return 1;
+         int ans1=0,ans2=0,ans3=0,ans4=0,flag=0;
+        if(place+4>group.get(groupid).length())return 0;
 
         //top
         int temp=mapNode.get(group.get(groupid).substring(place,place+5)).direction[0];
