@@ -53,6 +53,8 @@ public class Viewer extends Application {
     TextField textField;
     int countNum = 0;
     StringBuilder stringBuilder = new StringBuilder();
+    StringBuilder comStringBuilder = new StringBuilder();
+
     private final Text completionText = new Text("Well done!");
 
     class FXPiece extends ImageView {
@@ -443,7 +445,7 @@ public class Viewer extends Application {
      */
     void makePlacement(String placement){
 
-        tiles.getChildren().clear();
+        //tiles.getChildren().clear();
 
         for(int i=0;i<placement.length();i=i+5){
             String placementSegment = placement.substring(i,i+5);
@@ -544,6 +546,22 @@ public class Viewer extends Application {
         label.setFont(new Font("American Typewriter", 18));
 
         String s = generateDiceRoll();
+        //computerRandam = s;
+
+        Button AIMove  = new Button("AI Move");
+        AIMove.setLayoutX(705);
+        AIMove.setLayoutY(VIEWER_HEIGHT-50);
+        controls.getChildren().add(AIMove);
+
+        String comMove = generateMove(comStringBuilder.toString(),s);
+        comStringBuilder.append(comMove);
+
+        AIMove.setOnAction(e -> {
+            computer.getChildren().remove(tiles);
+            makePlacement(comStringBuilder.toString());
+            computer.getChildren().add(tiles);
+        });
+
         String[] tilePlacements = new String[4];
         DraggableFXPiece[] draggableTiles = new DraggableFXPiece[4];
 
@@ -559,7 +577,6 @@ public class Viewer extends Application {
         }
 
         randomDice.getChildren().addAll(border,label,draggableTiles[0], draggableTiles[1], draggableTiles[2], draggableTiles[3]);
-
     }
 
     /**
@@ -596,6 +613,7 @@ public class Viewer extends Application {
         scores.setLayoutY(GRID_LENGTH*6-3);
 
         int scoreNum = getBasicScore(stringBuilder.toString());
+        int scoreCom = getBasicScore(comStringBuilder.toString());
         //getAdvancedScore(stringBuilder.toString());
 
         Rectangle border = new Rectangle();
@@ -604,6 +622,15 @@ public class Viewer extends Application {
         border.setFill(null);
         border.setStrokeWidth(3);
         border.setStroke(Color.RED);
+
+        Rectangle borderCom = new Rectangle();
+        borderCom.setLayoutX(VIEWER_WIDTH-GRID_LENGTH*2.5);
+        borderCom.setLayoutY(GRID_LENGTH*6-3);
+        borderCom.setHeight(GRID_LENGTH*2);
+        borderCom.setWidth(GRID_LENGTH);
+        borderCom.setFill(null);
+        borderCom.setStrokeWidth(3);
+        borderCom.setStroke(Color.RED);
 
         Label label1 = new Label("SCORE");
         label1.setFont(new Font("American Typewriter", 22));
@@ -615,7 +642,18 @@ public class Viewer extends Application {
         label2.setLayoutX(24);
         label2.setLayoutY(75);
 
+        Label label3 = new Label("SCORE");
+        label3.setFont(new Font("American Typewriter", 22));
+        label3.setLayoutX(VIEWER_WIDTH-GRID_LENGTH*2.5);
+        label3.setLayoutY(GRID_LENGTH*6+3);
+
+        Label label4 = new Label( "" + scoreCom);
+        label4.setFont(new Font("American Typewriter", 40));
+        label4.setLayoutX(VIEWER_WIDTH-GRID_LENGTH*2.5);
+        label4.setLayoutY(GRID_LENGTH*6+35);
+
         scores.getChildren().addAll(border,label1,label2);
+        computer.getChildren().addAll(borderCom,label3,label4);
     }
 
     /**
@@ -682,10 +720,12 @@ public class Viewer extends Application {
         try {
             makePlacement("");
             stringBuilder = new StringBuilder();
+            comStringBuilder = new StringBuilder();
             hideCompletion();
             randomDice.getChildren().clear();
             setUpDice.getChildren().clear();
             scores.getChildren().clear();
+            computer.getChildren().clear();
             setSpecialDices();
             countNum = 0;
 
