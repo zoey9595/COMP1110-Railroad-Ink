@@ -747,6 +747,7 @@ public class Viewer extends Application {
         aiStage.setTitle("Computer Player");
         Scene aiScene = new Scene(computer, VIEWER_WIDTH, VIEWER_HEIGHT);
 
+        // Set computer player
         Button vsComputer = new Button("VS Computer");
         vsComputer.setLayoutX(590);
         vsComputer.setLayoutY(VIEWER_HEIGHT-50);

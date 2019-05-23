@@ -407,7 +407,6 @@ public class RailroadInk {
                 }
             }
 
-
             // if it connect to an exit, then continue loop
             if (connectToAnExit(boardString.substring(i,i+5)) >=0) {
                 i=i+5;
@@ -446,7 +445,6 @@ public class RailroadInk {
                 }
             }
             // A tile is invalid if neither connect to an exit nor a tile
-            //return false;
         }
         return true;
     }
@@ -475,7 +473,9 @@ public class RailroadInk {
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * @param boardString
+     * Get the Basic game score.
+     *
+     * @param boardString A well-formed whole board string.
      * @return
      */
     public static int getBasicScore(String boardString) {
@@ -508,8 +508,6 @@ public class RailroadInk {
             if(exits==11) ans+=40;
             if(exits==12) ans+=45;
 
-            //error多了两个
-            //System.out.println("route " + i + " has "+ ans + " score, then need to subtract " + error + " errors ");
             ans-=error;
         }
         //centre grid that are covered
@@ -545,15 +543,13 @@ public class RailroadInk {
         return nums;
     }
 
-    // 多个组
+    // Store different groups of routes
     static ArrayList<String> group=new ArrayList<String>();
-    //每个组包含的出口个数
+    // Each group's connection number
     static HashMap<String, Node> mapNode = new HashMap<String, Node>();
 
     /**
-     * 建立Node类
-     *
-     * 内置方向数组，初始方向都设定为-2
+     * Set Node class, set default directions to be -2
      */
     static class Node{
         int[] direction=new int[4];
@@ -566,7 +562,8 @@ public class RailroadInk {
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * 将所有节点根据是否组成路线，分组
+     * Divide different nodes into different groups.
+     *
      */
     static void getGroups(String boardString)
     {
@@ -578,65 +575,71 @@ public class RailroadInk {
         {
             Node node=new Node();
             String temp=boardString.substring(i,i+5);
+
             for(int j=0;j<4;j++){
-                //node.direction[j]=-2;
-                //如果检查到这个tile四个方向存在一个没有出口，设置对应的节点这个方向是0
+                // Set the no connection direction as 0
                 if(getvalue(temp,temp.charAt(4)-'0',j)==0) node.direction[j]=0;
             }
-            //如果在第一行，设置向上没有出口
+
+            // If the tile is in the first row, set its up direction as 0
             if(temp.charAt(2)=='A')node.direction[0]=0;
-            //如果最后一列，设置向右没有出口
+            // If the tile is in the last column, set its right direction as 0
             if(temp.charAt(3)=='6')node.direction[1]=0;
+            // If the tile is in the last row, set its down direction as 0
             if(temp.charAt(2)=='G')node.direction[2]=0;
+            // If the tile is in the first column, set its left direction as 0
             if(temp.charAt(3)=='0')node.direction[3]=0;
-            int find=0;//是否找到相邻的组
-            int findGroup=-1;//找到的第一个组
-            int nodeExits=-1;//是否连接出口
-            int neighbour=-1;//在已存在节点的哪个方向
-            // 检查node是否连接出口，返回值分别是0，1，2，3，上右下左
+            // Whether there are connecting groups
+            int find=0;
+            // The first group
+            int findGroup=-1;
+            // Whether it connects to an exit
+            int nodeExits=-1;
+            // The neighbor is in which direction of the note
+            int neighbour=-1;
+            // Check whether the node connects to an exit
             nodeExits=connectToAnExit(temp);
-            // 如果连接出口，设置node对应方向的方向值为-1
-            if(nodeExits>=0)node.direction[nodeExits]=-1;
+            // If the node connects to an exit, set the direction -1
+            if(nodeExits>=0) node.direction[nodeExits]=-1;
+
             for(int j=0;j<group.size();j++){
 
                 find=0;
                 String neighPlace="";
 
                 for(int k=0;k+4<group.get(j).length();k=k+5){
-                    // 检查当前块和总字符串所有块的连接情况
-                    // A在B上右下左分别返回0，1，2，3；不是neighbour返回-1
+                    // Check the connection condition of the temp
                     neighbour=areNeighbours(temp, group.get(j).substring(k,k+5));
 
                     if(neighbour>=0&&areConnectedNeighbours(temp,group.get(j).substring(k,k+5))) {
                         neighPlace= group.get(j).substring(k,k+5);
                         find=1;
-                        // 找到第一个连接的块就停止
+                        // Stop when finding the first connecting neighbour
                         break;
                     }
                 }
                 if(find==1){
                     if(findGroup==-1){
-                        //如果找到的相连的块是B2
+                        // If the connecting tile is B2
                         if(neighPlace.charAt(0)=='B'&&neighPlace.charAt(1)=='2'){
-                            //如果B2连接方向的对面没有连接路线
-                            //判断一个路径上是否存在已有节点，如果没有新建group
+                            // If no connection group on the opposite direction 
                             if(mapNode.get(neighPlace).direction[(neighbour+2)%4]==-2){
                                 findGroup=j;
                                 group.add(temp+neighPlace);
-                                //设置两个节点四周连接状态
+                                // Set the different connection condition
                                 node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                                 mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                                 j++;
                             }
-                            //如果B2连接方向的对面已经连接了路线
+                            // If there is a group in the opposite direction
                             else{
-                                //判断与B2相邻的节点是否属于该组
+                                // Whether the neighbour node belongs to the group
                                 for(int qq=0;qq+4<group.get(j).length();qq=qq+5){
                                     if(areNeighbours(group.get(j).substring(qq,qq+5),neighPlace)==(neighbour+2)%4){
-                                        //移入该组
+                                        // Move into the group
                                         findGroup=j;
                                         group.set(j,group.get(j).concat(temp));
-                                        //设置两个节点四周连接状态
+                                        // Set the connection direction
                                         node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                                         mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                                         j=group.size();
@@ -645,30 +648,29 @@ public class RailroadInk {
                                 }
                             }
                         }
-                        //如果找到的块不是B2
+                        // If the tile is not B2
                         else
                         {
-                            //移入该组
+                            //move into the group
                             findGroup=j;
                             group.set(j,group.get(j).concat(temp));
-                            //设置两个节点四周连接状态
+                            // Set the connection direction
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                         }
                     }
-                    //如果findGroup不等于-1
+                    // If findgroup is not equal to -1
                     else{
-                        //如果当前块是B2
-                        //B2 放入，各个组都需要添加
+                        // If temp is B2
                         if(temp.charAt(0)=='B'&&temp.charAt(1)=='2'){
-                            //移入该组
+                            //move into the group
                             group.set(j,group.get(j).concat(temp));
-                            //设置两个节点四周连接状态
+                            // Set the connection direction
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                         }else{
                             group.set(findGroup,group.get(findGroup)+group.get(j));
-                            //设置两个节点四周连接状态
+                            // Set the connection direction
                             node.direction[(neighbour+2)%4]=getvalue(temp,temp.charAt(4)-'0',(neighbour+2)%4);
                             mapNode.get(neighPlace).direction[neighbour]=getvalue(neighPlace,neighPlace.charAt(4)-'0',neighbour);
                             group.remove(j);
@@ -690,7 +692,9 @@ public class RailroadInk {
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
      *
-     * 设置地图
+     * Set up the map.
+     *
+     * @param boardString A five-character board string
      */
     static void setMap(String boardString) {
         for (int i = 0; i < 7; i++) {
@@ -707,9 +711,12 @@ public class RailroadInk {
 
     /**
      * Author: Huhan Jiang, Yuqing Zhai, Yufan Zhou
-     * @return
+     *
+     * Get valid place to put the tile
+     * @return the valid position
      */
     static String getValidPlace() {
+
         for (int i = 0; i < 7; i++) {
             for (int j = 0; j < 7; j++) {
                 if (map[i][j] == 0) {
@@ -746,10 +753,11 @@ public class RailroadInk {
                     char qqq=(char)('0'+j);
                     temp = diceRoll.substring(2 * i, 2 * i + 2) + place + qqq;
                     if (isValidPlacementSequence(boardString + temp) == true) {
-                        flag=true;break;
+                        flag = true;
+                        break;
                     }
                 }
-                if(flag==true)break;
+                if(flag) break;
                 place = getValidPlace();
             }
             boardString += temp;
