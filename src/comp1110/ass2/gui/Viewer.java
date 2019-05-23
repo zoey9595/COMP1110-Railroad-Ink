@@ -2,7 +2,6 @@ package comp1110.ass2.gui;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -48,7 +47,6 @@ public class Viewer extends Application {
     private final Group setUpDice = new Group();
     private final Group specialDices = new Group();
     private final Group scores = new Group();
-    private final Group basic = new Group();
     private final Group computer = new Group();
 
 
@@ -333,6 +331,111 @@ public class Viewer extends Application {
         root.getChildren().add(vb2);
     }
 
+    /*
+     * Draw a basic empty board and entrances in the window.
+     */
+    private void makeComputerBoard(){
+
+        computer.getChildren().clear();
+
+        Rectangle inBorder = new Rectangle();
+        inBorder.setX(100+GRID_LENGTH*2);
+        inBorder.setY(50+GRID_LENGTH*2);
+        inBorder.setWidth(GRID_LENGTH*3);
+        inBorder.setHeight(GRID_LENGTH*3);
+        inBorder.setFill(null);
+        inBorder.setStrokeWidth(2);
+        inBorder.setStroke(Color.RED);
+
+        Rectangle outBorder = new Rectangle();
+        outBorder.setX(100);
+        outBorder.setY(50);
+        outBorder.setWidth(GRID_LENGTH*7);
+        outBorder.setHeight(GRID_LENGTH*7);
+        outBorder.setFill(null);
+        outBorder.setStrokeWidth(4);
+        outBorder.setStroke(Color.BLACK);
+
+        Pane p = new Pane();
+
+        Rectangle [][] rec = new Rectangle [7][7];
+
+        for(int i=0; i<7; i++){
+            for(int j=0; j<7; j++){
+                rec[i][j] = new Rectangle();
+                rec[i][j].setX(100+i * GRID_LENGTH);
+                rec[i][j].setY(50+j * GRID_LENGTH);
+                rec[i][j].setWidth(GRID_LENGTH);
+                rec[i][j].setHeight(GRID_LENGTH);
+                if((i >= 2 && i < 5) && (j >=2 && j<5)) {
+                    rec[i][j].setFill(Color.LAVENDERBLUSH);
+                    rec[i][j].setStroke(Color.BLACK);
+
+                }else{
+                    rec[i][j].setFill(Color.ALICEBLUE);
+                    rec[i][j].setStroke(Color.BLACK);
+                }
+                p.getChildren().add(rec[i][j]);
+            }
+        }
+
+        computer.getChildren().addAll(p,inBorder,outBorder);
+
+        Image highExitImage = new Image(getClass().getResourceAsStream(URI_BASE+"HighExit.png"));
+        Image railExitImage = new Image(getClass().getResourceAsStream(URI_BASE+"RailExit.png"));
+
+        ImageView[] highExit = new ImageView[6];
+        ImageView[] railExit = new ImageView[6];
+
+        for (int i=0; i<6; i++){
+            highExit[i] = new ImageView();
+            railExit[i] = new ImageView();
+            highExit[i].setImage(highExitImage);
+            railExit[i].setImage(railExitImage);
+            highExit[i].setFitWidth(GRID_LENGTH);
+            highExit[i].setFitHeight(GRID_LENGTH);
+            railExit[i].setFitWidth(GRID_LENGTH);
+            railExit[i].setFitHeight(GRID_LENGTH);
+        }
+
+        HBox hb1 = new HBox();
+        hb1.getChildren().addAll(highExit[0], railExit[0], highExit[1]);
+        hb1.setSpacing(GRID_LENGTH);
+        hb1.setLayoutX(190);
+        hb1.setLayoutY(5);
+        computer.getChildren().add(hb1);
+
+        HBox hb2 = new HBox();
+        highExit[2].setRotate(180);
+        highExit[3].setRotate(180);
+        railExit[1].setRotate(180);
+        hb2.getChildren().addAll(highExit[2], railExit[1], highExit[3]);
+        hb2.setSpacing(GRID_LENGTH);
+        hb2.setLayoutX(190);
+        hb2.setLayoutY(5+7*GRID_LENGTH);
+        computer.getChildren().add(hb2);
+
+        VBox vb1 = new VBox();
+        railExit[2].setRotate(270);
+        highExit[4].setRotate(270);
+        railExit[3].setRotate(270);
+        vb1.getChildren().addAll(railExit[2],highExit[4],railExit[3]);
+        vb1.setSpacing(GRID_LENGTH);
+        vb1.setLayoutX(54);
+        vb1.setLayoutY(142);
+        computer.getChildren().add(vb1);
+
+        VBox vb2 = new VBox();
+        railExit[4].setRotate(90);
+        highExit[5].setRotate(90);
+        railExit[5].setRotate(90);
+        vb2.getChildren().addAll(railExit[4],highExit[5],railExit[5]);
+        vb2.setSpacing(GRID_LENGTH);
+        vb2.setLayoutX(54+7*GRID_LENGTH);
+        vb2.setLayoutY(140);
+        computer.getChildren().add(vb2);
+    }
+
     /**
      * Draw a full placement in the window, removing any previously drawn one.
      *
@@ -600,67 +703,24 @@ public class Viewer extends Application {
         primaryStage.setTitle("StepsGame Viewer");
         Scene scene = new Scene(root, VIEWER_WIDTH, VIEWER_HEIGHT);
 
-        Scene scene2 = new Scene(computer, VIEWER_WIDTH*2, VIEWER_HEIGHT);
-
-        Scene basicScene = new Scene(basic,  VIEWER_WIDTH, VIEWER_HEIGHT);
-
-        Label title = new Label("STEPS GAME");
-        title.setLayoutX(VIEWER_WIDTH/3-15);
-        title.setLayoutY(VIEWER_HEIGHT/2-GRID_LENGTH*2);
-        title.setAlignment(Pos.CENTER);
-        title.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 60));
-
-        Button oneplayer = new Button("One Player");
-        oneplayer.setLayoutX(VIEWER_WIDTH/3+45);
-        oneplayer.setLayoutY(VIEWER_WIDTH/2-GRID_LENGTH-45);
-        oneplayer.setAlignment(Pos.CENTER);
-        oneplayer.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
+        Stage aiStage = new Stage();
+        aiStage.setTitle("Computer Player");
+        Scene aiScene = new Scene(computer, VIEWER_WIDTH, VIEWER_HEIGHT);
 
         Button vsComputer = new Button("VS Computer");
-        vsComputer.setLayoutX(VIEWER_WIDTH/3+20);
-        vsComputer.setLayoutY(VIEWER_WIDTH/2+GRID_LENGTH/2-45);
-        vsComputer.setAlignment(Pos.CENTER);
-        vsComputer.setFont(Font.font("Arial", FontWeight.EXTRA_BOLD, 40));
-
-        oneplayer.setOnAction(e->{
-
-            root.getChildren().add(controls);
-            root.getChildren().add(board);
-            root.getChildren().add(tiles);
-            root.getChildren().add(randomDice);
-            root.getChildren().add(setUpDice);
-            root.getChildren().add(specialDices);
-            root.getChildren().add(scores);
-
-            makeControls();
-            makeBoard();
-            setRandomTiles();
-            setSpecialDices();
-            makeCompletion();
-            hideCompletion();
-            primaryStage.setScene(scene);
-        });
+        vsComputer.setLayoutX(590);
+        vsComputer.setLayoutY(VIEWER_HEIGHT-50);
 
         vsComputer.setOnAction(e->{
 
-            computer.getChildren().add(controls);
-            computer.getChildren().add(board);
-            computer.getChildren().add(tiles);
-            computer.getChildren().add(randomDice);
-            computer.getChildren().add(setUpDice);
-            computer.getChildren().add(specialDices);
-            computer.getChildren().add(scores);
+            makeComputerBoard();
 
-            makeControls();
-            makeBoard();
-            setRandomTiles();
-            setSpecialDices();
-            makeCompletion();
-            hideCompletion();
-            primaryStage.setScene(scene2);
+            aiStage.setScene(aiScene);
+            aiStage.show();
         });
 
-        /*root.getChildren().add(controls);
+        root.getChildren().add(vsComputer);
+        root.getChildren().add(controls);
         root.getChildren().add(board);
         root.getChildren().add(tiles);
         root.getChildren().add(randomDice);
@@ -673,12 +733,9 @@ public class Viewer extends Application {
         setRandomTiles();
         setSpecialDices();
         makeCompletion();
-        hideCompletion();*/
+        hideCompletion();
 
-        basic.getChildren().addAll(title,oneplayer,vsComputer);
-
-        primaryStage.setScene(basicScene);
-        //primaryStage.setScene(scene);
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
     public static void main(String[] args) {
